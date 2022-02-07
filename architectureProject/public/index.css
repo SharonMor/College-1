@@ -1,0 +1,14 @@
+div.chooseManu {
+    justify-content: space-evenly;
+    display: flex;
+}
+
+.signout-btn {
+    background-color: #f44336;
+    width: 10%;
+}
+
+.signout-btn:hover {
+    background-color: #f44336;
+    opacity: 1;
+}
