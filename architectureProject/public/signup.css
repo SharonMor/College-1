@@ -5,7 +5,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 input[type=tel] {
   width: 50%;
   padding: 15px;
-  margin: 5px 0 22px 0;
+  margin: 5px auto 22px auto;
   display: inline-block;
   border: none;
   background: #f1f1f1;
@@ -33,6 +33,11 @@ button:hover {
   opacity:1;
 }
 
+.free_text {
+  width: 50%;
+  margin: auto;
+}
+
 /* Extra styles for the cancel button */
 .cancelbtn {
   padding: 14px 20px;
@@ -55,9 +60,9 @@ button:hover {
   padding: 16px;
 }
 
-/* The Modal (background) */
-.modal {
-  display: none; /* Hidden by default */
+/* The Dialog (background) */
+.dialog {
+  display: block;
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
   left: 0;
@@ -69,8 +74,8 @@ button:hover {
   padding-top: 50px;
 }
 
-/* Modal Content/Box */
-.modal-content {
+/* Dialog Content/Box */
+.dialog-content {
   background-color: #fefefe;
   margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
   border: 1px solid #888;
@@ -85,9 +90,9 @@ hr {
  
 /* The Close Button (x) */
 .close {
-  position: absolute;
+  position: relative;
   right: 35px;
-  top: 15px;
+  top: 25px;
   font-size: 40px;
   font-weight: bold;
   color: #f1f1f1;

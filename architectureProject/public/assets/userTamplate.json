@@ -1,0 +1,11 @@
+ {
+    "aboutMe": "filled only if it's a barber user",
+    "isBarber": true,
+    "email": "",
+    "fullName": "",
+    "phone": "",
+    "reservation": [
+        "/reservations/<uuid0>",
+        "/reservations/<uuid1>"
+    ]
+}
