@@ -8,3 +8,7 @@ var firebaseConfig = {
   measurementId: "G-P70LX7LP75"
 };
 firebase.initializeApp(firebaseConfig);
+
+var auth = firebase.auth();
+var provider = new firebase.auth.GoogleAuthProvider();
+var db = firebase.firestore();

@@ -5,20 +5,20 @@ body {
   background-image: url(../assets/barberBackground.jpg);
   background-size: 100%;
   text-align: center;
-  color:antiquewhite;
-
+  color: antiquewhite;
 }
 table {
   display: flex;
+  color: black;
+  border-collapse: separate;
   border-spacing: 20px;
   align-content: center;
   flex-wrap: wrap;
   flex-direction: column;
-  border-collapse: separate;
-  color: black;
 }
 
 h1 {
+  color: antiquewhite;
   font-family: monospace;
   font-size: 3rem;
   text-transform: capitalize;
@@ -27,31 +27,38 @@ h1 {
   text-align: center;
 }
 
-.title {
-  color:antiquewhite;
-}
-
-#smart-button-container {
-  position: relative;
-  margin: auto;
-  width: 50%;
-}
-
-#checkBtn {
-  width: 30%;
-}
-
 td {
   font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 1.2em;
   background-color: rgba(85, 107, 47, 0.904);
   border: 4px solid black;
   border-color: solid black;
-  padding: 40px;
+  padding: 40px 30px;
   opacity: 0.85;
 }
+
 td:hover {
   opacity: 1;
   background-color: rgba(94, 121, 49, 0.904);
+}
+
+.name_span {
+    visibility: hidden;
+}
+
+/* #delayBtn {
+  visibility: hidden;
+} */
+#checkBtn{
+  position:relative;
+}
+
+td div span {
+    display: block;
+    margin-top: -31px;
+}
+td div span:first-child {
+    margin: 0px;
 }
 
 label {
@@ -59,17 +66,13 @@ label {
   font: 1rem "Fira Sans", sans-serif;
 }
 
-.costumerMenu {
-  display: flex;
-  justify-content: center;
+input,
+label {
+  margin: 0.4rem 0;
 }
-.costumerMenu div {
-  display: flex;
-  padding: 30px;
-  flex-direction: column;
-}
-input::placeholder {
-  color: rgb(143, 137, 137);
-  font-size: 1.2em;
-  font-style: italic;
+
+/* TODO: remove when connected to db */
+#spot3,
+#spot6 {
+  background: lightpink;
 }

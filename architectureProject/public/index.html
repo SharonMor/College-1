@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-firestore.js"></script>
 
     <script src="firebaseConfig.js"></script>
+    <script src="navbar.js" defer></script>
     <script src="app.js" defer></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
@@ -24,6 +25,7 @@
         <div class="container-fluid">
             <a href="./index.html" class="navbar-brand" href="#">Home</a>
             <div class="userProp">
+                <a><img id="avatar" class="avatar" src="../assets/avatar.png" alt="" width="30" height="24"></a>
                 <span id="userName" class="navbar-brand mb-0 h1"></span>
                 <button id="navSignUpBtn" class="btn btn-outline-success me-2" type="button" hidden="false">Sign
                     Up</button>
@@ -32,7 +34,6 @@
             </div>
         </div>
     </nav>
-
     <br>
 
     <div id="signUpDialog" class="dialog" hidden="true">
@@ -51,7 +52,7 @@
                 </label>
 
                 <div>
-                    <textarea id="freeText" name="text" class="free_text" row="3" cols="50">Tell something about yourself.</textarea>
+                    <textarea id="freeText" name="text" class="free_text" placeholder="Tell something about yourself." row="3" cols="50"></textarea>
                 </div>
                 <div class="clearfix">
                     <button id="cancelDialogBtn" type="button" class="cancelbtn">Cancel</button>

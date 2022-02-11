@@ -1,17 +1,214 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Page Title</title>
-<script src="sms-service.js"></script>
-<link rel="stylesheet" href="../styles.css">
+    <title>Barber</title>
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-firestore.js"></script>
+
+    <script src="../firebaseConfig.js"></script>
+    <script src="../navbar.js" defer></script>
+    <script src="barberpagejs.js" defer></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="../navbar.css">
+    <link rel="stylesheet" href="../signup.css">
+    <link rel="stylesheet" href="barberstyle.css">
 </head>
+
 <body>
+    <nav class="navbar sticky-top navbar-dark bg-dark">
+        <div class="container-fluid">
+           <a href="../index.html" class="navbar-brand" href="#">Home</a>
+           <div class="userProp">
+            <a><img id="avatar" class="avatar" src="../assets/avatar.png" alt="" width="30" height="24"></a>
+           <span id="userName" class="navbar-brand mb-0 h1"></span>
+           <button id="navSignUpBtn" class="btn btn-outline-success me-2" type="button" hidden="false">Sign
+                   Up</button>
+           <button id="navSignOutBtn" class="btn btn-outline-success me-2" type="button" hidden="true">Sign
+                   Out</button>
+           </div>
+        </div>
+      </nav>
 
-<h1>My First Heading</h1>
-<p>My Barber</p>
+      <div id="signUpDialog" class="dialog" hidden="true">
+        <span id="xDialog" class="close" title="Close Window">&times;</span>
+        <form class="dialog-content">
+            <div class="container">
+                <h1>Sign Up</h1>
+                <p>Please fill in this form to create an account.</p>
+                <label for="phone"><b>Phone Number</b></label><br>
+                <input type="tel" id="phone" name="phone" placeholder="054-4567899" pattern="[0-9]{3}--[0-9]{7}"
+                    required>
 
-<div>
-</div>
+                <br>
+                <label>
+                    <input type="checkbox" id="barberToggle" name="barber" style="margin-bottom:15px"> Are you a barber?
+                </label>
+
+                <div>
+                    <textarea id="freeText" name="text" class="free_text" placeholder="Tell something about yourself." row="3" cols="50"></textarea>
+                </div>
+                <div class="clearfix">
+                    <button id="cancelDialogBtn" type="button" class="cancelbtn">Cancel</button>
+                    <button id="googleSignInBtn" class="btn-primary signupbtn">Sign in with Google</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <h1>My Schedule</h1>
+
+    <label for="start">Select Date:</label>
+
+    <input type="date" id="start" name="trip-start" value="2022-02-20" min="2022-01-01" max="2023-01-01">
+    <br>
+    <button class="btn btn-primary" id="checkBtn">Check</button>
+
+    <div hidden id="timeTable">
+        <table>
+            <!-- TODO: generate all cells in js -->
+            <tr id="row1">
+                <td id="spot1">
+                    <div>
+                        <span class="time_span" id="spot1time">08:00</span>
+                        <span class="name_span" id="spot1name">nameOne</span>
+                    </div>
+                </td>
+                <td id="spot2">
+                    <div>
+                        <span class="time_span" id="spot2time">08:30</span>
+                        <span class="name_span" id="spot2name">name Two</span>
+                    </div>
+                </td>
+                <td id="spot3">
+                    <div>
+                        <span class="time_span" id="spot3time">09:00</span>
+                        <span class="name_span" id="spot3name">nameThree</span>
+                    </div>
+                </td>
+                <td id="spot4">
+                    <div>
+                        <span class="time_span" id="spot4time">09:30</span>
+                        <span class="name_span" id="spot4name">nameFour</span>
+                    </div>
+                </td>
+                <td id="spot5">
+                    <div>
+                        <span class="time_span" id="spot5time">10:00</span>
+                        <span class="name_span" id="spot5name">nameFive</span>
+                    </div>
+                </td>
+                <td id="spot6">
+                    <div>
+                        <span class="time_span" id="spot6time">10:30</span>
+                        <span class="name_span" id="spot6name">nameSix</span>
+                    </div>
+                </td>
+                <td id="spot7">
+                    <div>
+                        <span class="time_span" id="spot7time">11:00</span>
+                        <span class="name_span" id="spot7name">nameSeven</span>
+                    </div>
+                </td>
+            </tr>
+            <tr id="row2">
+                <td id="spot8">
+                    <div>
+                        <span class="time_span" id="spot8time">11:30</span>
+                        <span class="name_span" id="spot1name">nameEight</span>
+                    </div>
+                </td>
+                <td id="spot9">
+                    <div>
+                        <span class="time_span" id="spot9time">12:00</span>
+                        <span class="name_span" id="spot1name">nameNine</span>
+                    </div>
+                </td>
+                <td id="spot10">
+                    <div>
+                        <span class="time_span" id="spot10time">12:30</span>
+                        <span class="name_span" id="spot1name">nameTen</span>
+                    </div>
+                </td>
+                <td id="spot11">
+                    <div>
+                        <span class="time_span" id="spot11time">13:00</span>
+                        <span class="name_span" id="spot1name">nameEleven</span>
+                    </div>
+                </td>
+                <td id="spot12">
+                    <div>
+                        <span class="time_span" id="spot12time">13:30</span>
+                        <span class="name_span" id="spot1name">name12</span>
+                    </div>
+                </td>
+                <td id="spot13">
+                    <div>
+                        <span class="time_span" id="spot13time">14:00</span>
+                        <span class="name_span" id="spot1name">nameE13</span>
+                    </div>
+                </td>
+                <td id="spot14">
+                    <div>
+                        <span class="time_span" id="spot14time">14:30</span>
+                        <span class="name_span" id="spot1name">name14</span>
+                    </div>
+                </td>
+            </tr>
+            <tr id="row3">
+                <td id="spot15">
+                    <div>
+                        <span class="time_span" id="spot15time">15:00</span>
+                        <span class="name_span" id="spot1name">name15</span>
+                    </div>
+                </td>
+                <td id="spot16">
+                    <div>
+                        <span class="time_span" id="spot16time">15:30</span>
+                        <span class="name_span" id="spot1name">name16</span>
+                    </div>
+                </td>
+                <td id="spot17">
+                    <div>
+                        <span class="time_span" id="spot17time">16:00</span>
+                        <span class="name_span" id="spot1name">name17</span>
+                    </div>
+                </td>
+                <td id="spot18">
+                    <div>
+                        <span class="time_span" id="spot18time">16:30</span>
+                        <span class="name_span" id="spot1name">name18</span>
+                    </div>
+                </td>
+                <td id="spot19">
+                    <div>
+                        <span class="time_span" id="spot19time">17:00</span>
+                        <span class="name_span" id="spot1name">name19</span>
+                    </div>
+                </td>
+                <td id="spot20">
+                    <div>
+                        <span class="time_span" id="spot20time">17:30</span>
+                        <span class="name_span" id="spot1name">name20</span>
+                    </div>
+                </td>
+                <td id="spot21">
+                    <div>
+                        <span class="time_span" id="spot21time">18:00</span>
+                        <span class="name_span" id="spot1name">name21</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <button class="btn btn-info" id="delayBtn" disabled="disabled">Delay Selected Haircut</button>
+
+    </div>
 
 </body>
+
 </html>
