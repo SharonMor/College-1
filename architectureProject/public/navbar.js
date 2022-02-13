@@ -30,11 +30,9 @@ navSignOutBtn.addEventListener("click", () => {
 
   signOutPromise
     .then((onSignedOut) => {
-    window.location.href = homeLocation;
+      window.location.href = homeLocation;
     })
     .catch((error) => console.log(`Error signing out: ${error}`));
-
-  // dialog.hidden = true;
 });
 
 navSignUpBtn.onclick = () => (dialog.hidden = false);
@@ -117,3 +115,14 @@ function addUserIfNotExist(user) {
       console.log(`Error getting user: ${user.email}`, error);
     });
 }
+
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    // signed in
+    avatar.addEventListener("click", () => {
+      let profileLocation = `${window.location.origin}/profileComponent/profile.html`;
+
+      window.location.href = profileLocation;
+    });
+  }
+});
