@@ -35,6 +35,7 @@ td {
   border-color: solid black;
   padding: 40px 30px;
   opacity: 0.85;
+  pointer-events: none;
 }
 
 td:hover {
@@ -46,11 +47,8 @@ td:hover {
     visibility: hidden;
 }
 
-/* #delayBtn {
-  visibility: hidden;
-} */
-#checkBtn{
-  position:relative;
+button {
+  width: 30%;
 }
 
 td div span {
@@ -71,8 +69,16 @@ label {
   margin: 0.4rem 0;
 }
 
-/* TODO: remove when connected to db */
-#spot3,
-#spot6 {
-  background: lightpink;
+.delay_text {
+  background-color: rgba(140, 140, 140, 0.55);
+  border-radius: 4.44rem;
+  padding: 10px 20px;
+  margin: auto;
+  align-items: center;
+  width: fit-content;
+}
+
+.delay_urgent {
+  color: coral;
+  font-weight: bold;
 }

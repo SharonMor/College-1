@@ -73,3 +73,11 @@ input::placeholder {
   font-size: 1.2em;
   font-style: italic;
 }
+
+.paypalWrapper {
+  background-color: rgba(140, 140, 140, 0.55);
+  border-radius: 4.44rem;
+  padding: 10px 0;
+  margin: auto;
+  align-items: center;
+}

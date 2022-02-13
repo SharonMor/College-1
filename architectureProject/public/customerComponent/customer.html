@@ -11,13 +11,13 @@
     ></script>
     <script src="../firebaseConfig.js"></script>
     <script src="../navbar.js" defer></script>
+    <script src="../utils.js" defer></script>
+    <script src="../generateTable.js" defer></script>
     <script src="customerpagejs.js" defer></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
     integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <title>Customers</title>
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"> -->
         <link rel="stylesheet" href="../navbar.css">
         <link rel="stylesheet" href="../signup.css">
         <link rel="stylesheet" href="customer.css" />
@@ -76,14 +76,7 @@
       <div class="chooseDate">
         <label for="start">Select Date:</label>
 
-        <input
-          type="date"
-          id="dateInput"
-          name="date_input"
-          value="2022-02-20"
-          min="2022-01-01"
-          max="2023-01-01"
-        />
+        <input type="date" id="dateInput" name="date_input"/>
       </div>
     </div>
     <button class="btn btn-primary" id="checkBtn" disabled>Check</button>
@@ -91,8 +84,8 @@
     <!-- Table is to be inserted by generateTable() by js -->
     <div hidden id="timeTable"></div>
 
-    <textarea id="noteForBarber" name="noteForBarber" placeholder="Something your barber needs to know?" rows="2" cols="50"></textarea>
-    <div id="smart-button-container">
+    <textarea hidden id="noteForBarber" name="noteForBarber" placeholder="Something your barber needs to know?" rows="2" cols="50"></textarea>
+    <div hidden id="smart-button-container">
       <div style="text-align: center">
         <div style="margin-bottom: 1.25rem">
           <p>
@@ -100,7 +93,7 @@
             haristyles. Then add your payment method.
           </p>
           <select class="haircutsSelector" id="item-options">
-            <option value="">Select A haircut.. …</option>
+            <option value="notSelected" selected disabled>Select A haircut..…</option>
             <option value="Back On The Block" price="8">Back On The Block - 8 USD</option>
             <option value="Bruv" price="9">Bruv - 9 USD</option>
             <option value="Left Over" price="9">Left Over - 9 USD</option>
@@ -113,7 +106,7 @@
             <option value="Crew Love" price="15">Crew Love - 15 USD</option>
           </select>
           <div>
-            <img src="CustomerAssets/Bruv_hair_cut.jpg" id="bruvHair" hidden> 
+            <img src="CustomerAssets/Bruv_hair_cut.jpg" id="bruvHair" hidden>
             <img src="CustomerAssets/Left_over_hair_cut.jpg" id="leftOverHair" hidden>
             <img src="CustomerAssets/Sky_high_hair_cut.jpg" id="skyHighHair" hidden>  
             <img src="CustomerAssets/Good_fellas_hair_cut.jpg" id="goodFellasHair" hidden> 
@@ -127,7 +120,9 @@
           </div>
           <select style="visibility: hidden" id="quantitySelect"></select>
         </div>
+        <div class="paypalWrapper">
         <div id="paypal-button-container"></div>
+      </div>
       </div>
     </div>
   </body>

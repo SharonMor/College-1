@@ -107,6 +107,7 @@ function addUserIfNotExist(user) {
           aboutMe: aboutMeText,
           email: user.email,
           fullName: user.displayName,
+          profileImg: user.photoURL,
           phone: phoneNumber.value,
           reservations: [],
         });

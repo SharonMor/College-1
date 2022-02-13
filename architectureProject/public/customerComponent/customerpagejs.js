@@ -4,32 +4,7 @@ const timeTable = document.getElementById("timeTable");
 const paypalWrapper = document.getElementById("smart-button-container"); //paypal buttons
 const barberNote = document.getElementById("noteForBarber");
 
-const selectElement = document.getElementById("item-options");
-const bruvHair = document.getElementById("bruvHair");
-const leftOverHair = document.getElementById("leftOverHair");
-const skyHighHair = document.getElementById("skyHighHair");
-const goodFellasHair = document.getElementById("goodFellasHair"); //haircuts declarations
-const messiHair = document.getElementById("messiHair");
-const moreLifeHair = document.getElementById("moreLifeHair");
-const pompItHair = document.getElementById("pompItHair");
-const organaizedHair = document.getElementById("organaizedHair");
-const backOnTheBlockHair = document.getElementById("backOnTheBlockHair");
-const crewLoveHair = document.getElementById("crewLoveHair");
-
-bruvHair.hidden = true;
-leftOverHair.hidden = true;
-skyHighHair.hidden = true;
-goodFellasHair.hidden = true;
-messiHair.hidden = true;
-moreLifeHair.hidden = true;
-pompItHair.hidden = true;
-organaizedHair.hidden = true;
-backOnTheBlockHair.hidden = true;
-crewLoveHair.hidden = true;
-
-barberNote.hidden = true;
-timeTable.hidden = true;
-paypalWrapper.hidden = true;
+const selectedHaircut = document.getElementById("item-options");
 
 // pull data for barbers select
 ///// Firestore /////
@@ -85,53 +60,10 @@ barbersSelect.addEventListener("change", () => {
   timeTable.hidden = true;
 });
 
-// returns index of cell by offset (by default = 0.5)
-// e.g (hour = 17, offset = 0.5) => 19
-// offset is the time jump between hours.
-let getIndexByHour = (hour, startTime = startHour, offsetNum = offset) =>
-  (hour - startTime) / offsetNum + 1;
-
-// constant values for table
-const startHour = 8;
-const endHour = 18;
-const numOfCols = 7;
-const offset = 0.5;
-
-function generateTable() {
-  // generating hours table
-  let tableHours = [];
-
-  tableHours.push("<table>");
-  for (let i = startHour; i <= endHour; i += offset) {
-    // check for a remainder when dividing by 1
-    const isFraction = !(i % 1 === 0);
-    const isBelow10 = i < 10;
-    let hour;
-    let rowNum;
-    let index = getIndexByHour(i);
-
-    if (isFraction) hour = isBelow10 ? `0${i - offset}:30` : `${i - offset}:30`;
-    else hour = isBelow10 ? `0${i}:00` : `${i}:00`;
-
-    // pushing tr's to table hours
-    if ((index - 1) % numOfCols == 0) {
-      rowNum = (index - 1) / numOfCols;
-      // if first cell
-      if (index - 1 == 0) tableHours.push(`<tr id="row${rowNum}">`);
-      // closing opened tr and opening new one
-      else tableHours.push(`</tr><tr id="row${rowNum}">`);
-    }
-    // pushing cell
-    tableHours.push(
-      `<td id="spot${index}">
-       <span class="time_span" id="spot${index}time">${hour}</span>
-     </td>`
-    );
-  }
-  tableHours.push("</tr></table>");
-  timeTable.innerHTML = tableHours.join("");
-}
+// generating timeTable
 generateTable();
+
+const allTableCells = document.querySelectorAll("#timeTable td");
 
 // modifying booked table cells
 auth.onAuthStateChanged((user) => {
@@ -139,7 +71,6 @@ auth.onAuthStateChanged((user) => {
     // Database Reference
     usersRef = db.collection("users");
 
-    const allTableCells = document.querySelectorAll("#timeTable td");
     checkBtn.addEventListener("click", () => {
       // clearing old busy cells
       allTableCells.forEach((tableCell) => {
@@ -169,19 +100,19 @@ auth.onAuthStateChanged((user) => {
                 .get()
                 .then((doc) => {
                   // filtering only current day
-                  let dbDate = doc.data().date.toDate();
+                  let docDate = doc.data().date.toDate();
                   let chosenDate = new Date(dateInput.value);
-                  if (areDatesEqual(dbDate, chosenDate)) {
+                  if (areDatesEqual(docDate, chosenDate)) {
                     // converting time (e.g 8:30 --> 8.5)
-                    let hourNum = dbDate.getHours();
-                    hourNum += dbDate.getMinutes() == 0 ? 0 : 0.5;
+                    let hourNum = docDate.getHours();
+                    hourNum += docDate.getMinutes() == 0 ? 0 : 0.5;
                     const index = getIndexByHour(hourNum);
                     let busyCell = document.getElementById(`spot${index}`);
                     busyCell.style.backgroundColor = "#ffb6c1";
                     busyCell.style.pointerEvents = "none";
 
                     console.log("index is: ", index);
-                    console.log(dbDate.getHours(), dbDate.getMinutes());
+                    console.log(docDate.getHours(), docDate.getMinutes());
                   }
                 })
                 .catch((error) => {
@@ -207,32 +138,18 @@ auth.onAuthStateChanged((user) => {
   }
 });
 
-// checking if year,month,day are equal
-function areDatesEqual(actual, expected) {
-  return (
-    actual.getFullYear() === expected.getFullYear() &&
-    actual.getMonth() === expected.getMonth() &&
-    actual.getDate() === expected.getDate()
-  );
-}
-
-// document.querySelectorAll('#timeTable td')
-// .forEach(tableCell => tableCell.addEventListener("mouseover", () => {
-//     if(tableCell.style.backgroundColor == "rgba(85, 107, 47, 0.904)"){
-//       console.log(tableCell.style.innerHTML);
-//       console.log(tableCell.style.backgroundColor);
-//         tableCell.style.backgroundColor = "#ffffff";}
-//     },false));
 let previousCellClicked;
-document.querySelectorAll("#timeTable td").forEach((tableCell) =>
+let previousBgColor;
+allTableCells.forEach((tableCell) =>
   tableCell.addEventListener("click", () => {
       //when some cell is clicked
       if (previousCellClicked) {
-        previousCellClicked.style.backgroundColor = "rgba(85, 107, 47, 0.904)"; //green
+        previousCellClicked.style.backgroundColor = previousBgColor; //green
       }
       //when clicking on a different cell (not on the same one)
       if (previousCellClicked != tableCell) {
         previousCellClicked = tableCell;
+        previousBgColor = tableCell.style.backgroundColor;
         tableCell.style.backgroundColor = "rgb(50, 158, 231)"; //blue
         paypalWrapper.hidden = false;
         barberNote.hidden = false;
@@ -243,79 +160,45 @@ document.querySelectorAll("#timeTable td").forEach((tableCell) =>
         paypalWrapper.hidden = true;
         barberNote.hidden = true;
       }
-    }, false));
+    }));
 
 checkBtn.addEventListener("click", () => {
   if (timeTable.hidden) timeTable.hidden = false;
 });
 
-// function getSelectedValue(){
-//   var selectedValue=document.getElementById("item-options").value;
-//   // console.log(selectedValue);
-// }
 
-// TODO: map images to selected index
-// let prvSelectedHairStyle;
+const haircutsValueToImgId = new Map();
+haircutsValueToImgId.set("Back On The Block", "backOnTheBlockHair");
+haircutsValueToImgId.set("Bruv", "bruvHair");
+haircutsValueToImgId.set("Left Over", "leftOverHair");
+haircutsValueToImgId.set("Sky High", "skyHighHair");
+haircutsValueToImgId.set("Good Fellas", "goodFellasHair");
+haircutsValueToImgId.set("Messi", "messiHair");
+haircutsValueToImgId.set("More Life", "moreLifeHair");
+haircutsValueToImgId.set("Pomp It Up" , "pompItHair");
+haircutsValueToImgId.set("Organized Chaos", "organaizedHair");
+haircutsValueToImgId.set("Crew Love", "crewLoveHair");
 
-// selectElement.addEventListener('change', () => {
-//   if (prvSelectedHairStyle) {
-//     prvSelectedHairStyle.hidden = true;
-//   }
-//   const select = document.getElementById("item-options");
-//   const selectedHairStyle = select.options[select.selectedIndex];
-//   prvSelectedHairStyle = selectedHairStyle;
-//   selectedHairStyle.hidden = false;
-// })
+let prevShownImg;
 
-selectElement.addEventListener("change", () => {
-  var selectedInnerValue = document.getElementById("item-options").value;
-  console.log(selectedInnerValue);
-  if (selectedInnerValue == "Left Over") {
-    hidePics();
-    leftOverHair.hidden = false;
-  } else if (selectedInnerValue == "Back On The Block") {
-    hidePics();
-    backOnTheBlockHair.hidden = false;
-  } else if (selectedInnerValue == "Bruv") {
-    hidePics();
-    bruvHair.hidden = false;
-  } else if (selectedInnerValue == "Sky High") {
-    hidePics();
-    skyHighHair.hidden = false;
-  } else if (selectedInnerValue == "Good Fellas") {
-    hidePics();
-    goodFellasHair.hidden = false;
-  } else if (selectedInnerValue == "Messi") {
-    hidePics();
-    messiHair.hidden = false;
-  } else if (selectedInnerValue == "More Life") {
-    hidePics();
-    moreLifeHair.hidden = false;
-  } else if (selectedInnerValue == "Pomp It Up") {
-    hidePics();
-    pompItHair.hidden = false;
-  } else if (selectedInnerValue == "Organized Chaos") {
-    hidePics();
-    organaizedHair.hidden = false;
-  } else if (selectedInnerValue == "Crew Love") {
-    hidePics();
-    crewLoveHair.hidden = false;
+selectedHaircut.addEventListener("change", () => {
+  if (prevShownImg) {
+    prevShownImg.hidden = true;
   }
+  const imgIdToShow = haircutsValueToImgId.get(selectedHaircut.value);
+  const imgToShow = document.getElementById(imgIdToShow);
+  prevShownImg = imgToShow;
+  imgToShow.hidden = false;
 });
 
-function hidePics() {
-  bruvHair.hidden = true;
-  leftOverHair.hidden = true;
-  skyHighHair.hidden = true;
-  goodFellasHair.hidden = true;
-  messiHair.hidden = true;
-  moreLifeHair.hidden = true;
-  pompItHair.hidden = true;
-  organaizedHair.hidden = true;
-  backOnTheBlockHair.hidden = true;
-  crewLoveHair.hidden = true;
-}
 
+
+
+
+
+
+
+/// Paypal ///
 function initPayPalButton() {
   var shipping = 0;
   var itemOptions = document.querySelector(
