@@ -1,67 +1,28 @@
-const whenSignedIn = document.getElementById("whenSignedIn");
-const userDetails = document.getElementById("userDetails");
+const barberBtn = document.getElementById("barberBtn");
+const customerBtn = document.getElementById("customerBtn");
 
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    // signed in
-    whenSignedIn.hidden = false;
-    userDetails.innerHTML = `<h3>Hello ${user.displayName}!</h3> <p>User ID: ${user.uid}</p>`;
-  } else {
-    // not signed in
-    whenSignedIn.hidden = true;
-    userDetails.innerHTML = "";
-  }
-});
-
-///// Firestore /////
-const addReservation = document.getElementById("addReservationData");
-const addUser = document.getElementById("addUserData");
-const loadData = document.getElementById("loadData");
-const thingsList = document.getElementById("thingsList");
-
-let reservationsRef;
-let unsubscribe;
-
-// push data to DB (phone connected to mail)
 auth.onAuthStateChanged((user) => {
   if (user) {
     // Database Reference
-    reservationsRef = db.collection("reservations");
+    usersRef = db.collection("users");
 
-    addReservation.onclick = () => {
-      const { serverTimestamp } = firebase.firestore.FieldValue;
+    usersRef
+      .where("email", "==", user.email)
+      .get()
+      .then((querySnapshot) => {
+        // if user exists
+        if (querySnapshot.size == 1) {
+          isBarber = querySnapshot.docs[0].data().isBarber;
 
-      reservationsRef.add({
-        date: serverTimestamp(),
-        note: "some note",
-        barberId: "SomeBarberId",
-        customerId: "SomeCustomerId",
+          customerBtn.hidden = isBarber;
+          barberBtn.hidden = !isBarber;
+        }
+      })
+      .catch((error) => {
+        console.log(`Error getting user: ${user.email}`, error);
       });
-    };
-
-    // // Query
-    // unsubscribe = usersRef
-    //   // .where('uid', '==', user.uid)
-    //   // .orderBy('createdAt') // Requires a query
-    //   .onSnapshot((querySnapshot) => {
-    //     // Map results to an array of li elements
-    //     const items = querySnapshot.docs.map((doc) => {
-    //       return `<li>${doc.data().email}</li>`;
-    //     });
-    //     thingsList.innerHTML = items.join("");
-    //   });
-    // unsubscribe = reservationsRef
-    //   // .where('uid', '==', user.uid)
-    //   // .orderBy('createdAt') // Requires a query
-    //   .onSnapshot((querySnapshot) => {
-    //     // Map results to an array of li elements
-    //     const items = querySnapshot.docs.map((doc) => {
-    //       return `<li>${doc.data().date}</li>`;
-    //     });
-    //     thingsList.innerHTML = items.join("");
-    //   });
   } else {
-    // Unsubscribe when the user signs out
-    // unsubscribe && unsubscribe();
+    customerBtn.hidden = true;
+    barberBtn.hidden = true;
   }
 });

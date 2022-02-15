@@ -5,9 +5,50 @@ body {
   background-image: url(../assets/barberBackground.jpg);
   background-size: 100%;
   text-align: center;
-  color:antiquewhite;
-
+  color: antiquewhite;
 }
+
+.item1 {
+  grid-area: header;
+  font-weight: bold;
+}
+.barberSpeech {
+  grid-area: footer;
+}
+.barberMail {
+  grid-area: main;
+}
+.barberPhone {
+  grid-area: right;
+}
+#barberPhone:hover {
+  background-color: #44be85;
+}
+
+.grid-container {
+  color: black;
+  display: grid;
+  grid-template-areas:
+    "header header header header header header"
+    "main main main right right right"
+    "footer footer footer footer footer footer";
+  grid-gap: 2px;
+  padding: 0 0 15px 0;
+  justify-content: center;
+}
+
+.grid-container > div {
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 1px 25px;
+  font-size: 20px;
+}
+
+.whatsappLink {
+  padding-left: 15px;
+  margin-right: -18px;
+}
+
 table {
   display: flex;
   border-spacing: 20px;
@@ -28,7 +69,7 @@ h1 {
 }
 
 .title {
-  color:antiquewhite;
+  color: antiquewhite;
 }
 
 #smart-button-container {
@@ -74,10 +115,17 @@ input::placeholder {
   font-style: italic;
 }
 
-.paypalWrapper {
+.paypalBtnWrapper {
   background-color: rgba(140, 140, 140, 0.55);
-  border-radius: 4.44rem;
+  border-top-left-radius: 10%;
+  border-top-right-radius: 10%;
+  border-bottom-left-radius: 5.44rem;
+  border-bottom-right-radius: 5.44rem;
   padding: 10px 0;
   margin: auto;
   align-items: center;
+}
+
+.haircuts_imgs img {
+  border-radius: 5%;
 }

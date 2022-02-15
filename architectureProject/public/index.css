@@ -1,14 +1,65 @@
-div.chooseManu {
-    justify-content: space-evenly;
-    display: flex;
+html {
+  background-image: url(./assets/barberBackground.jpg);
 }
 
 .signout-btn {
-    background-color: #f44336;
-    width: 10%;
+  background-color: #f44336;
+  width: 10%;
 }
 
 .signout-btn:hover {
-    background-color: #f44336;
-    opacity: 1;
+  background-color: #f44336;
+  opacity: 1;
+}
+
+button:disabled:hover {
+  opacity: 0.5;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+#background-video1 {
+  height: 85vh;
+  width: 50vw;
+  /* object-fit: cover; */
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 50;
+  bottom: 0;
+  z-index: -1;
+}
+#background-video2 {
+  background-position: left;
+  height: 85vh;
+  width: 50vw;
+  /* object-fit: cover; */
+  position: fixed;
+  left: 50;
+  right: 0;
+  top: 50;
+  bottom: 0;
+  z-index: -1;
+}
+
+td button {
+    width: 10%;
+}
+
+#barberBtn {
+  /* color: aliceblue; */
+  top: 55%;
+  left: 17%;
+  position: absolute;
+  z-index: 2;
+}
+
+#customerBtn {
+  /* color: aliceblue; */
+  top: 55%;
+  left: 71%;
+  position: absolute;
+  z-index: 2;
 }

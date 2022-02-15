@@ -34,7 +34,6 @@
             </div>
         </div>
     </nav>
-    <br>
 
     <div id="signUpDialog" class="dialog" hidden="true">
         <span id="xDialog" class="close" title="Close Window">&times;</span>
@@ -52,7 +51,8 @@
                 </label>
 
                 <div>
-                    <textarea id="freeText" name="text" class="free_text" placeholder="Tell something about yourself." row="3" cols="50"></textarea>
+                    <textarea id="freeText" name="text" class="free_text" placeholder="Tell something about yourself."
+                        row="3" cols="50"></textarea>
                 </div>
                 <div class="clearfix">
                     <button id="cancelDialogBtn" type="button" class="cancelbtn">Cancel</button>
@@ -62,39 +62,28 @@
         </form>
     </div>
 
-    <section id="whenSignedIn" hidden="true">
-        <div id="userDetails"></div>
-    </section>
-
-    <!-- <section id="whenSignedOut">
-        <button id="signInBtn" class="btn btn-primary">Sign in with Google</button>
-    </section>
-
-    <section id="whenSignedIn" hidden="true">
-        <div id="userDetails"></div>
-        <button id="signOutBtn" class="btn btn-primary">Sign Out</button>
-    </section> -->
-    <hr>
-
-    <div style="width: 30%; margin: auto;">
-        <button id="addReservationData">add Reservation data</button>
-        <button id="addUserData">add User</button>
-        <button id="loadData">load all data</button>
-    </div>
-
-    <ul id="thingsList">
-
-    </ul>
-
-    <div class="chooseManu">
-        <a href="./barberComponent/barber.html">
-            <button>Barber</button>
-        </a>
-        <a href="./customerComponent/customer.html">
-            <button>Customer</button>
-        </a>
-    </div>
-
+    <table>
+        <tr>
+            <td><video id="background-video1" autoplay loop muted>
+                    <source src="MainAssets/barberVideo.mp4" type="video/mp4">
+                </video></td>
+            <td><video id="background-video2" autoplay loop muted>
+                    <source src="MainAssets/costumerVideo.mp4" type="video/mp4">
+                </video></td>
+        </tr>
+    </table>
+    <table id="buttonsTable">
+        <tr>
+            <div id="buttons">
+                <td><a href="./barberComponent/barber.html">
+                        <button id=barberBtn>Barber</button>
+                    </a></td>
+                <td><a href="./customerComponent/customer.html">
+                        <button id=customerBtn>Customer</button>
+                    </a></td>
+            </div>
+        </tr>
+    </table>
 </body>
 
 </html>

@@ -28,6 +28,7 @@ dateInput.max = nextYearDate.toISOString().split("T")[0];
 dateInput.addEventListener("change", () => {
   timeTable.hidden = true;
   delayContainer.hidden = true;
+  delayBtn.disabled = true;
 });
 
 // generate timeTable
@@ -65,45 +66,39 @@ auth.onAuthStateChanged((user) => {
 
               // resDoc holds the actual doc in db
               let resDoc = db.collection(reservations).doc(resId);
-              resDoc
-                // .get()
-                // .then((doc) => {
-                .onSnapshot((doc) => {
-                  let docData = doc.data();
-                  let customerNote = docData.note;
+              resDoc.onSnapshot((doc) => {
+                let docData = doc.data();
+                let customerNote = docData.note;
 
-                  // filtering only current day
-                  let docDate = docData.date.toDate();
-                  let chosenDate = new Date(dateInput.value);
-                  if (areDatesEqual(docDate, chosenDate)) {
-                    // converting time (e.g 8:30 --> 8.5)
-                    let hourNum = docDate.getHours();
-                    hourNum += docDate.getMinutes() == 0 ? 0 : 0.5;
-                    const index = getIndexByHour(hourNum);
-                    let busyCell = document.getElementById(`spot${index}`);
-                    busyCell.style.backgroundColor = "#ffb6c1";
-                    busyCell.style.pointerEvents = "auto";
-                    busyCell.title = customerNote;
-                    tableCellIdToResId.set(`spot${index}`, resId);
+                // filtering only current day
+                let docDate = docData.date.toDate();
+                let chosenDate = new Date(dateInput.value);
+                if (areDatesEqual(docDate, chosenDate)) {
+                  // converting time (e.g 8:30 --> 8.5)
+                  let hourNum = docDate.getHours();
+                  hourNum += docDate.getMinutes() == 0 ? 0 : 0.5;
+                  const index = getIndexByHour(hourNum);
+                  let busyCell = document.getElementById(`spot${index}`);
+                  busyCell.style.backgroundColor = "#ffb6c1";
+                  busyCell.style.pointerEvents = "auto";
+                  busyCell.title = customerNote;
+                  tableCellIdToResId.set(`spot${index}`, resId);
 
-                    // change name to the appropriate customer user.
-                    let busyCellName = document.getElementById(`spot${index}name`);
-                    let customerRef = usersRef.doc(docData.customerId);
-                    customerRef
-                      .get()
-                      .then((customerDoc) => {
-                        let customerName = customerDoc.data().fullName;
-                        busyCellName.innerHTML = customerName;
-                        console.log("customerName is: ", customerName);
-                      });
+                  // change name to the appropriate customer user.
+                  let busyCellName = document.getElementById(
+                    `spot${index}name`
+                  );
+                  let customerRef = usersRef.doc(docData.customerId);
+                  customerRef.get().then((customerDoc) => {
+                    let customerName = customerDoc.data().fullName;
+                    busyCellName.innerHTML = customerName;
+                    console.log("customerName is: ", customerName);
+                  });
 
-                    console.log("index is: ", index);
-                    console.log(docDate.getHours(), docDate.getMinutes());
-                  }
-                })
-                // .catch((error) => {
-                //   console.log("Error getting document:", error);
-                // });
+                  console.log("index is: ", index);
+                  console.log(docDate.getHours(), docDate.getMinutes());
+                }
+              });
             });
           } else if (querySnapshot.size == 0) {
             console.log(
@@ -148,23 +143,23 @@ let previousCellClicked;
 let previousBgColor;
 allTableCells.forEach((tableCell) =>
   tableCell.addEventListener("click", () => {
-      if (previousCellClicked) {
-        previousCellClicked.style.backgroundColor = previousBgColor;
-      }
-      // when clicking on a different cell (not on the same one)
-      if (previousCellClicked != tableCell) {
-        previousCellClicked = tableCell;
-        previousBgColor = tableCell.style.backgroundColor;
-        tableCell.style.backgroundColor = "rgb(50, 158, 231)"; //blue
-        delayBtn.disabled = false;
-      }
-      // when clicking on the same cell ("turning it off")
-      else {
-        previousCellClicked = null;
-        delayBtn.disabled = true;
-      }
-    }));
-
+    if (previousCellClicked) {
+      previousCellClicked.style.backgroundColor = previousBgColor;
+    }
+    // when clicking on a different cell (not on the same one)
+    if (previousCellClicked != tableCell) {
+      previousCellClicked = tableCell;
+      previousBgColor = tableCell.style.backgroundColor;
+      tableCell.style.backgroundColor = "rgb(50, 158, 231)"; //blue
+      delayBtn.disabled = false;
+    }
+    // when clicking on the same cell ("turning it off")
+    else {
+      previousCellClicked = null;
+      delayBtn.disabled = true;
+    }
+  })
+);
 
 // handle delay haircut
 auth.onAuthStateChanged((user) => {
@@ -172,7 +167,7 @@ auth.onAuthStateChanged((user) => {
     // Database Reference
     reservationsRef = db.collection("reservations");
 
-    delayBtn.addEventListener('click', () => {
+    delayBtn.addEventListener("click", () => {
       let cellId = previousCellClicked.id;
       let resId = tableCellIdToResId.get(cellId);
       let resRef = reservationsRef.doc(resId);
@@ -182,29 +177,24 @@ auth.onAuthStateChanged((user) => {
         .then((doc) => {
           let docDate = doc.data().date.toDate();
           // delay in 30 min
-          let halfAnHourInSec = 30*60000;
+          let halfAnHourInSec = 30 * 60000;
           let delayedDate = new Date(docDate.getTime() + halfAnHourInSec);
           resRef.update({ date: delayedDate });
 
           // resting chosen cell table
-          previousCellClicked.style.backgroundColor = "rgba(94, 121, 49, 0.904)"; // green
+          previousCellClicked.style.backgroundColor =
+            "rgba(94, 121, 49, 0.904)"; // green
           previousCellClicked.style.pointerEvents = "none";
           previousCellClicked = null;
           delayBtn.disabled = true;
         })
         .catch((error) => {
           console.log("Error getting/updating document:", error);
-        })
+        });
     });
   }
 });
-    
 
-
-
-
-
-    
 // document.querySelectorAll('#timeTable td')
 // .forEach(tableCell => tableCell.addEventListener("mouseover", () => {
 //     previousSpotHover=tableCell.innerHTML;

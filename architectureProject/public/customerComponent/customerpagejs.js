@@ -2,14 +2,21 @@ const checkBtn = document.getElementById("checkBtn");
 const timeTable = document.getElementById("timeTable");
 
 const paypalWrapper = document.getElementById("smart-button-container"); //paypal buttons
-const barberNote = document.getElementById("noteForBarber");
+const customerNote = document.getElementById("noteForBarber");
 
 const selectedHaircut = document.getElementById("item-options");
 
-// pull data for barbers select
-///// Firestore /////
 const barbersSelect = document.getElementById("barbers");
+const barberInfo = document.getElementById("barberInfo");
+const barberMail = document.getElementById("barberMail");
+const barberPhoneText = document.getElementById("barberPhoneText");
+const barberWhatsappLink = document.getElementById("whatsappLink");
+const barberSpeech = document.getElementById("barberSpeech");
+const paypalElement = document.getElementById("paypal-button-container");
+const paypalBtnWrapper = document.getElementById("paypalBtnWrapper");
 
+///// Firestore /////
+// pull data for barbers select
 // usersRef is already initialized in navbar.js
 let unsubscribe;
 auth.onAuthStateChanged((user) => {
@@ -26,7 +33,8 @@ auth.onAuthStateChanged((user) => {
           const barberName = doc.data().fullName;
           return `<option value="${barberName}">${barberName}</option>`;
         });
-        barbersSelect.innerHTML = '<option value="notSelected" selected disabled>Choose barber</option>';
+        barbersSelect.innerHTML =
+          '<option value="notSelected" selected disabled>Choose barber</option>';
         barbersSelect.innerHTML += items.join("");
       });
   } else {
@@ -52,12 +60,44 @@ dateInput.max = nextYearDate.toISOString().split("T")[0];
 // hiding the table when data changes
 dateInput.addEventListener("change", () => {
   timeTable.hidden = true;
+  paypalWrapper.hidden = true;
 });
 
 // enabling checkBtn on selecting a barber
 barbersSelect.addEventListener("change", () => {
   checkBtn.disabled = false;
   timeTable.hidden = true;
+});
+
+// modifying the barber info
+barbersSelect.addEventListener("change", () => {
+  barberInfo.hidden = false;
+
+  const user = firebase.auth().currentUser;
+  if (user) {
+    usersRef = db.collection("users");
+
+    // getting barber name
+    const selectedBarber =
+      barbersSelect.options[barbersSelect.selectedIndex].value;
+    // getting selected barber info
+    usersRef
+      .where("isBarber", "==", true)
+      .where("fullName", "==", selectedBarber)
+      .get()
+      .then((querySnapshot) => {
+        const barberData = querySnapshot.docs[0].data();
+
+        barberMail.innerHTML = barberData.email;
+        barberPhoneText.innerHTML = barberData.phone;
+        const phoneNumber = barberData.phone.replace("-", "");
+        barberWhatsappLink.href = `https://wa.me/972${phoneNumber}`;
+        barberSpeech.innerHTML = barberData.aboutMe;
+      })
+      .catch((error) => {
+        console.log(`Error getting user: ${user.email}`, error);
+      });
+  }
 });
 
 // generating timeTable
@@ -142,30 +182,28 @@ let previousCellClicked;
 let previousBgColor;
 allTableCells.forEach((tableCell) =>
   tableCell.addEventListener("click", () => {
-      //when some cell is clicked
-      if (previousCellClicked) {
-        previousCellClicked.style.backgroundColor = previousBgColor; //green
-      }
-      //when clicking on a different cell (not on the same one)
-      if (previousCellClicked != tableCell) {
-        previousCellClicked = tableCell;
-        previousBgColor = tableCell.style.backgroundColor;
-        tableCell.style.backgroundColor = "rgb(50, 158, 231)"; //blue
-        paypalWrapper.hidden = false;
-        barberNote.hidden = false;
-      }
-      //when clicking on the same cell ("turning it off")
-      else {
-        previousCellClicked = null;
-        paypalWrapper.hidden = true;
-        barberNote.hidden = true;
-      }
-    }));
+    //when some cell is clicked
+    if (previousCellClicked) {
+      previousCellClicked.style.backgroundColor = previousBgColor; //green
+    }
+    //when clicking on a different cell (not on the same one)
+    if (previousCellClicked != tableCell) {
+      previousCellClicked = tableCell;
+      previousBgColor = tableCell.style.backgroundColor;
+      tableCell.style.backgroundColor = "rgb(50, 158, 231)"; //blue
+      paypalWrapper.hidden = false;
+    }
+    //when clicking on the same cell ("turning it off")
+    else {
+      previousCellClicked = null;
+      paypalWrapper.hidden = true;
+    }
+  })
+);
 
 checkBtn.addEventListener("click", () => {
   if (timeTable.hidden) timeTable.hidden = false;
 });
-
 
 const haircutsValueToImgId = new Map();
 haircutsValueToImgId.set("Back On The Block", "backOnTheBlockHair");
@@ -175,7 +213,7 @@ haircutsValueToImgId.set("Sky High", "skyHighHair");
 haircutsValueToImgId.set("Good Fellas", "goodFellasHair");
 haircutsValueToImgId.set("Messi", "messiHair");
 haircutsValueToImgId.set("More Life", "moreLifeHair");
-haircutsValueToImgId.set("Pomp It Up" , "pompItHair");
+haircutsValueToImgId.set("Pomp It Up", "pompItHair");
 haircutsValueToImgId.set("Organized Chaos", "organaizedHair");
 haircutsValueToImgId.set("Crew Love", "crewLoveHair");
 
@@ -189,33 +227,84 @@ selectedHaircut.addEventListener("change", () => {
   const imgToShow = document.getElementById(imgIdToShow);
   prevShownImg = imgToShow;
   imgToShow.hidden = false;
+  paypalBtnWrapper.hidden = false;
 });
 
+function addReservation() {
+  const user = firebase.auth().currentUser;
 
+  if (user) {
+    reservationsRef = db.collection("reservations");
+    usersRef = db.collection("users");
 
+    const noteToDb = customerNote.value;
+    let customerIdToDb;
+    let barberIdToDb;
+    let dateToDb;
 
+    // getting signed user info
+    usersRef
+      .where("email", "==", user.email)
+      .get()
+      .then((querySnapshot) => {
+        customerIdToDb = querySnapshot.docs[0].id;
+        // getting barber name
+        const selectedBarber =
+          barbersSelect.options[barbersSelect.selectedIndex].value;
 
+        // get date
+        const chosenDate = new Date(dateInput.value);
+        let chosenHour = previousCellClicked.querySelector("span").innerHTML;
+        // sub(0,2) = hours, sub(3,5) = minutes
+        chosenDate.setHours(chosenHour.substr(0, 2), chosenHour.substr(3, 5));
+        dateToDb = firebase.firestore.Timestamp.fromDate(chosenDate);
 
+        // getting selected barber info
+        usersRef
+          .where("isBarber", "==", true)
+          .where("fullName", "==", selectedBarber)
+          .get()
+          .then((barberQuerySnapshot) => {
+            const barberData = barberQuerySnapshot.docs[0];
+            const barberIdToDb = barberData.id;
 
+            reservationsRef
+              .add({
+                date: dateToDb,
+                note: noteToDb,
+                barberId: barberIdToDb,
+                customerId: customerIdToDb,
+              })
+              .then((newRes) => {
+                console.log("Reservation has been added with ID: ", newRes.id);
+
+                // add new reservation to customer
+                usersRef.doc(customerIdToDb).update({
+                  reservations: firebase.firestore.FieldValue.arrayUnion(
+                    db.doc(`/reservations/${newRes.id}`)
+                  ),
+                });
+
+                // add new reservation to barber
+                usersRef.doc(barberIdToDb).update({
+                  reservations: firebase.firestore.FieldValue.arrayUnion(
+                    db.doc(`/reservations/${newRes.id}`)
+                  ),
+                });
+              });
+          })
+          .catch((error) => {
+            console.log(`Error getting barber: ${selectedBarber}`, error);
+          });
+      })
+      .catch((error) => {
+        console.log(`Error getting user: ${user.email}`, error);
+      });
+  }
+}
 
 /// Paypal ///
 function initPayPalButton() {
-  var shipping = 0;
-  var itemOptions = document.querySelector(
-    "#smart-button-container #item-options"
-  );
-  var quantity = parseInt();
-  var quantitySelect = document.querySelector(
-    "#smart-button-container #quantitySelect"
-  );
-  if (!isNaN(quantity)) {
-    quantitySelect.style.visibility = "visible";
-  }
-  var orderDescription =
-    "In order to place an order, Please select one of the following haristyles. Then add your payment method.";
-  if (orderDescription === "") {
-    orderDescription = "Item";
-  }
   paypal
     .Buttons({
       style: {
@@ -225,86 +314,42 @@ function initPayPalButton() {
         label: "paypal",
       },
       createOrder: function (data, actions) {
-        var selectedItemDescription =
-          itemOptions.options[itemOptions.selectedIndex].value;
-        var selectedItemPrice = parseFloat(
-          itemOptions.options[itemOptions.selectedIndex].getAttribute("price")
-        );
-        var tax =
-          20 === 0 || false ? 0 : selectedItemPrice * (parseFloat(20) / 100);
-        if (quantitySelect.options.length > 0) {
-          quantity = parseInt(
-            quantitySelect.options[quantitySelect.selectedIndex].value
+        const haircutDescription =
+          selectedHaircut.options[selectedHaircut.selectedIndex].value;
+        const haircutPrice =
+          selectedHaircut.options[selectedHaircut.selectedIndex].getAttribute(
+            "price"
           );
-        } else {
-          quantity = 1;
-        }
-
-        tax *= quantity;
-        tax = Math.round(tax * 100) / 100;
-        var priceTotal =
-          quantity * selectedItemPrice + parseFloat(shipping) + tax;
-        priceTotal = Math.round(priceTotal * 100) / 100;
-        var itemTotalValue =
-          Math.round(selectedItemPrice * quantity * 100) / 100;
 
         return actions.order.create({
           purchase_units: [
             {
-              description: orderDescription,
+              description: haircutDescription,
               amount: {
                 currency_code: "USD",
-                value: priceTotal,
-                breakdown: {
-                  item_total: {
-                    currency_code: "USD",
-                    value: itemTotalValue,
-                  },
-                  shipping: {
-                    currency_code: "USD",
-                    value: shipping,
-                  },
-                  tax_total: {
-                    currency_code: "USD",
-                    value: tax,
-                  },
-                },
+                value: haircutPrice,
               },
-              items: [
-                {
-                  name: selectedItemDescription,
-                  unit_amount: {
-                    currency_code: "USD",
-                    value: selectedItemPrice,
-                  },
-                  quantity: quantity,
-                },
-              ],
             },
           ],
         });
       },
       onApprove: function (data, actions) {
         return actions.order.capture().then(function (orderData) {
-          // Full available details
-          console.log(
-            "Capture result",
-            orderData,
-            JSON.stringify(orderData, null, 2)
-          );
-
           // Show a success message within this page, e.g.
-          const element = document.getElementById("paypal-button-container");
-          element.innerHTML = "";
-          element.innerHTML = "<h3>Thank you for your payment!</h3>";
+          paypalElement.innerHTML = "<h3>Thank you for your payment!</h3>";
 
-          // Or go to another URL:  actions.redirect('thank_you.html');
+          addReservation();
         });
+      },
+      onCancel: function (data, actions) {
+        paypalElement.innerHTML =
+          "<h3>The payment has been canceled!</h3>" +
+          "<br><h6>If you want to place an order refresh the page</h6>";
       },
       onError: function (err) {
         console.log(err);
       },
     })
-    .render("#paypal-button-container");
+    .render(paypalElement);
 }
 initPayPalButton();

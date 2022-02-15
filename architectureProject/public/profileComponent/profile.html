@@ -69,7 +69,9 @@
                 <span id="profileName"></span>
             </div>
             <div class="item2">
-                <a><img id="profilePic" class="pic_profile" src="../assets/avatar.png" alt="" referrerpolicy="no-referrer"></a>            </div>
+                <a><img id="profilePic" class="pic_profile" src="../assets/avatar.png" alt=""
+                        referrerpolicy="no-referrer"></a>
+            </div>
             <div class="item3">
                 <span id="profileEmail"></span>
             </div>
@@ -81,13 +83,16 @@
                 <span id="profilePhone"></span>
             </div>
         </div>
+        <div class="reservationsContainer">
+            <p>Future Reservations:</p>
+            <table id="reservationsList" class="reservationsList"></table>
+        </div>
 
-        <dl id="reservationsList" class="reservationsList">
-            <p>Futurue Reservations:</p>
-            <dt>Reservation1 <button> Cancel </button></dt>
-            <dt>Reservation1 <button> Cancel </button></dt>
-            <dt>Reservation1 <button> Cancel </button></dt>
-        </dl>
+        <hr>
+        <div class="cancel_container">
+            <input id="resInputId" type="text" placeholder="Enter a reservation id:">
+            <button id="cancelBtn">Cancel</button>
+        </div>
     </div>
 </body>
 </head>

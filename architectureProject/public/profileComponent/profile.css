@@ -58,3 +58,31 @@ h1 {
 .reservationsList button {
     width: 15%;
 }
+
+.reservationsContainer {
+   color: antiquewhite
+}
+
+.resName {
+  float: left;
+}
+
+.resId {
+  float: right;
+}
+
+table {
+  margin: auto;
+}
+
+.resName {
+  padding: 0;
+}
+
+.resId {
+  padding: 0;
+}
+
+td span {
+  padding: 0 30px;
+}
