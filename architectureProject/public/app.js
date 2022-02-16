@@ -8,19 +8,16 @@ auth.onAuthStateChanged((user) => {
 
     usersRef
       .where("email", "==", user.email)
-      .get()
-      .then((querySnapshot) => {
+      .onSnapshot((querySnapshot) => {
         // if user exists
         if (querySnapshot.size == 1) {
           isBarber = querySnapshot.docs[0].data().isBarber;
 
-          customerBtn.hidden = isBarber;
           barberBtn.hidden = !isBarber;
+          customerBtn.hidden = false;
         }
-      })
-      .catch((error) => {
-        console.log(`Error getting user: ${user.email}`, error);
       });
+
   } else {
     customerBtn.hidden = true;
     barberBtn.hidden = true;

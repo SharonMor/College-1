@@ -1,4 +1,5 @@
 const signInGoogleBtn = document.getElementById("googleSignInBtn");
+const continueDialogBtn = document.getElementById("continueDialogBtn");
 const navSignOutBtn = document.getElementById("navSignOutBtn");
 const avatar = document.getElementById("avatar");
 
@@ -13,13 +14,15 @@ const phoneNumber = document.getElementById("phone");
 const freeText = document.getElementById("freeText");
 const barberToggle = document.getElementById("barberToggle");
 
-signInGoogleBtn.disabled = true;
+continueDialogBtn.disabled = true;
 freeText.hidden = true;
+let usersRef;
+let avatarOriginSrc = avatar.src;
 
 ///// User Authentication /////
 /// Sign in event handlers
 // TODO: consider change to signInWithReDirect
-signInGoogleBtn.addEventListener("click", () => {
+navSignUpBtn.addEventListener("click", () => {
   auth.signInWithPopup(provider);
   // auth.signInWithRedirect(provider);
 });
@@ -35,15 +38,37 @@ navSignOutBtn.addEventListener("click", () => {
     .catch((error) => console.log(`Error signing out: ${error}`));
 });
 
-navSignUpBtn.onclick = () => (dialog.hidden = false);
-xDialog.onclick = () => (dialog.hidden = true);
-cancelDialogBtn.onclick = () => (dialog.hidden = true);
+xDialog.onclick = () => {
+  clearUser();
+};
+cancelDialogBtn.onclick = () => {
+  clearUser();
+};
 
 auth.onAuthStateChanged((user) => {
   if (user) {
     // signed in
-    // close signup dialog and display off signup-btn
-    dialog.hidden = true;
+    // open signup dialog if user isn't registered
+    usersRef = db.collection("users");
+
+    usersRef
+      .where("email", "==", user.email)
+      .get()
+      .then((querySnapshot) => {
+        // if user isn't exists -> adding new user
+        if (querySnapshot.size == 0) {
+          dialog.hidden = false;
+
+          continueDialogBtn.onclick = () => {
+            addUserIfNotExist(user);
+          };
+        }
+      })
+      .catch((error) => {
+        console.log(`Error getting user: ${user.email}`, error);
+      });
+
+    // dialog.hidden = true;
     navSignUpBtn.hidden = true;
     navSignOutBtn.hidden = false;
 
@@ -58,21 +83,10 @@ auth.onAuthStateChanged((user) => {
   }
 });
 
-let usersRef;
-
-// push data to DB (phone connected to mail)
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    // Database Reference
-    usersRef = db.collection("users");
-    addUserIfNotExist(user);
-  }
-});
-
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function (event) {
   if (event.target == dialog) {
-    dialog.hidden = true;
+    clearUser();
   }
 };
 
@@ -85,7 +99,7 @@ phoneNumber.addEventListener("input", () => {
   const phoneRegex = new RegExp("[0-9]{3}-[0-9]{7}");
   const match = phoneNumber.value.match(phoneRegex);
 
-  signInGoogleBtn.disabled = !(match && phoneNumber.value === match[0]);
+  continueDialogBtn.disabled = !(match && phoneNumber.value === match[0]);
 });
 
 function addUserIfNotExist(user) {
@@ -109,6 +123,8 @@ function addUserIfNotExist(user) {
           phone: phoneNumber.value,
           reservations: [],
         });
+
+        dialog.hidden = true;
       }
     })
     .catch((error) => {
@@ -119,10 +135,19 @@ function addUserIfNotExist(user) {
 auth.onAuthStateChanged((user) => {
   if (user) {
     // signed in
-    avatar.addEventListener("click", () => {
-      let profileLocation = `${window.location.origin}/profileComponent/profile.html`;
-
-      window.location.href = profileLocation;
-    });
+    avatar.addEventListener("click", redirectToProfile);
   }
 });
+
+function redirectToProfile() {
+  let profileLocation = `${window.location.origin}/profileComponent/profile.html`;
+
+  window.location.href = profileLocation;
+}
+
+function clearUser() {
+  dialog.hidden = true;
+  avatar.src = avatarOriginSrc;
+  auth.signOut();
+  avatar.removeEventListener("click", redirectToProfile);
+}

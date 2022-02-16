@@ -8,8 +8,8 @@ body {
 }
 
 .main_content {
-    margin: auto;
-    width: 50%;
+  margin: auto;
+  width: 50%;
 }
 
 h1 {
@@ -26,9 +26,6 @@ h1 {
   grid-area: main;
 }
 .item4 {
-  grid-area: right;
-}
-.item5 {
   grid-area: footer;
 }
 
@@ -36,9 +33,9 @@ h1 {
   display: grid;
   grid-template-areas:
     "header header header header header header"
-    "menu main main main right right"
-    "menu footer footer footer footer footer";
-  grid-gap: 10px;
+    "menu menu main main main main"
+    "menu menu footer footer footer footer";
+  grid-gap: 3px;
   background-color: #796147;
   padding: 10px;
 }
@@ -56,11 +53,11 @@ h1 {
 }
 
 .reservationsList button {
-    width: 15%;
+  width: 15%;
 }
 
 .reservationsContainer {
-   color: antiquewhite
+  color: antiquewhite;
 }
 
 .resName {
@@ -85,4 +82,9 @@ table {
 
 td span {
   padding: 0 30px;
+}
+
+.pic_profile {
+  object-fit: fill;
+  width: 100%;
 }

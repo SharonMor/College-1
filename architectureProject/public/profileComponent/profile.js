@@ -1,7 +1,6 @@
 const profileName = document.getElementById("profileName");
 const profilePic = document.getElementById("profilePic");
 const profileEmail = document.getElementById("profileEmail");
-const profileIsBarber = document.getElementById("profileIsBarber");
 const profilePhone = document.getElementById("profilePhone");
 const reservationsList = document.getElementById("reservationsList");
 const resInputId = document.getElementById("resInputId");
@@ -17,10 +16,10 @@ auth.onAuthStateChanged((user) => {
       .where("email", "==", user.email)
       .onSnapshot((querySnapshot) => {
         let userData = querySnapshot.docs[0].data();
-        profileName.innerHTML = userData.fullName;
+        let isBarberName = userData.isBarber ? "Barber" : "Customer";
+        profileName.innerHTML = `${userData.fullName} (${isBarberName})`;
         profilePic.src = userData.profileImg;
         profileEmail.innerHTML = userData.email;
-        profileIsBarber.checked = userData.isBarber;
         profilePhone.innerHTML = userData.phone;
 
         reservationsList.innerHTML = "";
@@ -63,8 +62,7 @@ auth.onAuthStateChanged((user) => {
               console.log(`reservation ${doc.id} has been deleted!`);
               // removing element from DOM
               let dtResElement = document.getElementById(doc.id);
-              if (dtResElement)
-                dtResElement.remove();
+              if (dtResElement) dtResElement.remove();
             }
           });
         });
@@ -78,6 +76,10 @@ auth.onAuthStateChanged((user) => {
 // adding event listener to cancel
 cancelBtn.addEventListener("click", () => {
   let resId = resInputId.value;
+  if (!resId) {
+    alert("No such reservation! please rewrite the correct id");
+    return;
+  }
   let resRef = db.collection("reservations").doc(resId);
   let usersRef = db.collection("users");
 
