@@ -23,10 +23,17 @@ video {
   filter: brightness(50%);
 }
 
-.welcome_title h1 {
+.main_title {
   background-color: #fbeee0a2;
   color: #422800;
+}
+
+.welcome_title h1 {
   padding: 5px;
+}
+
+.signOut_notify h5 {
+  padding-bottom: 5px;
 }
 
 #barberBtn {
