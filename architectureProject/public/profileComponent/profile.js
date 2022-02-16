@@ -106,6 +106,28 @@ cancelBtn.addEventListener("click", () => {
           .delete()
           .then(() => {
             alert(`Reservation ${doc.id} successfully deleted!`);
+
+            // sending cancellation mails
+            // sending mail to barber
+            barberRef.get().then((barberDoc) => {
+              barberData = barberDoc.data();
+              sendMail(
+                barberData.email,
+                barberData.fullName,
+                doc.data().date.toDate(),
+                doc.id
+              );
+            });
+            // sending mail to barber
+            customerRef.get().then((customerDoc) => {
+              customerData = customerDoc.data();
+              sendMail(
+                customerData.email,
+                customerData.fullName,
+                doc.data().date.toDate(),
+                doc.id
+              );
+            });
           })
           .catch((error) => {
             console.error("Error removing reservation: ", error);
@@ -120,3 +142,32 @@ cancelBtn.addEventListener("click", () => {
 
   console.log();
 });
+
+function sendMail(emailTo, displayName, resDate, resId) {
+  let bodyToSend = `<h2>hello ${displayName}</h2>
+    <h4>we would like to inform you that your reservation has been cancelled.</h4>
+    <br>
+    <table>
+      <tr>
+        <td>date:</td>
+        <td>${resDate}</td>
+      </tr>
+      <tr>
+        <td>reservation id:</td>
+        <td>${resId}</td>
+      </tr>
+    </table>
+    <h4>For more information please contact the barber.</h4>
+    <br>
+    <h5>details about the barber can be found in the website's booking page</h5>`;
+
+  Email.send({
+    Host: "smtp.gmail.com",
+    Username: "mybarbershop17@gmail.com",
+    Password: "yuval1234",
+    To: emailTo,
+    From: "mybarbershop17@gmail.com",
+    Subject: "MyBarber reservation has been canceled",
+    Body: bodyToSend,
+  });
+}

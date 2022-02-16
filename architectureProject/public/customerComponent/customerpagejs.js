@@ -232,6 +232,7 @@ selectedHaircut.addEventListener("change", () => {
 
 function addReservation() {
   const user = firebase.auth().currentUser;
+  const chosenBarberIndex = barbersSelect.selectedIndex;
 
   if (user) {
     reservationsRef = db.collection("reservations");
@@ -285,22 +286,27 @@ function addReservation() {
                   ),
                 });
 
-                // add new reservation to barber
-                usersRef.doc(barberIdToDb).update({
-                  reservations: firebase.firestore.FieldValue.arrayUnion(
-                    db.doc(`/reservations/${newRes.id}`)
-                  ),
-                });
+                // add new reservation to barber, and set barber selected to prev value
+                usersRef
+                  .doc(barberIdToDb)
+                  .update({
+                    reservations: firebase.firestore.FieldValue.arrayUnion(
+                      db.doc(`/reservations/${newRes.id}`)
+                    ),
+                  })
+                  .then(
+                    () => (barbersSelect[chosenBarberIndex].selected = true)
+                  );
 
                 // sending mail
                 const user = auth.currentUser;
                 const haircutDescription =
                   selectedHaircut.options[selectedHaircut.selectedIndex].value;
                 const haircutPrice =
-                  selectedHaircut.options[selectedHaircut.selectedIndex]
-                    .getAttribute("price");
-                let bodyToSend = 
-                `<h2>hello ${user.displayName}</h2>
+                  selectedHaircut.options[
+                    selectedHaircut.selectedIndex
+                  ].getAttribute("price");
+                let bodyToSend = `<h2>hello ${user.displayName}</h2>
                 <h4>your reservation has been approved.</h4>
                 <br>
                 <table>

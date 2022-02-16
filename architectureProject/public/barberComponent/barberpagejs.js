@@ -166,6 +166,7 @@ auth.onAuthStateChanged((user) => {
   if (user) {
     // Database Reference
     reservationsRef = db.collection("reservations");
+    usersRef = db.collection("users");
 
     delayBtn.addEventListener("click", () => {
       let cellId = previousCellClicked.id;
@@ -183,36 +184,46 @@ auth.onAuthStateChanged((user) => {
             .update({ date: delayedDate })
             .then(() => {
               // sending mail
-              const user = auth.currentUser;
-              let bodyToSend = `<h2>hello ${user.displayName}</h2>
-                <h4>we would like to inform you that your barber delayed your reservation.</h4>
-                <br>
-                <table>
-                  <tr>
-                    <td>old date:</td>
-                    <td>${docDate}</td>
-                  </tr>
-                  <tr>
-                    <td><b>new date:</b></td>
-                    <td>${delayedDate}</td>
-                  </tr>
-                  <tr>
-                    <td>reservation id:</td>
-                    <td>${resId}</td>
-                  </tr>
-                </table>
-                <h4>For more information please contact the barber.</h4>
-                <br>
-                <h5>details about the barber can be found in the website's booking page</h5>`;
+              // const user = auth.currentUser;
+              resRef.get().then((resDoc) => {
+                let targetCustomerRef = usersRef.doc(resDoc.data().customerId);
 
-              Email.send({
-                Host: "smtp.gmail.com",
-                Username: "mybarbershop17@gmail.com",
-                Password: "yuval1234",
-                To: user.email,
-                From: "mybarbershop17@gmail.com",
-                Subject: "MyBarber reservation has been delayed",
-                Body: bodyToSend,
+                targetCustomerRef.get().then((targetDoc) => {
+                  let targetName = targetDoc.data().fullName;
+                  let targetEmail = targetDoc.data().email;
+
+                  let bodyToSend = 
+                    `<h2>hello ${targetName}</h2>
+                      <h4>we would like to inform you that your barber delayed your reservation.</h4>
+                      <br>
+                      <table>
+                        <tr>
+                          <td>old date:</td>
+                          <td>${docDate}</td>
+                        </tr>
+                        <tr>
+                          <td><b>new date:</b></td>
+                          <td>${delayedDate}</td>
+                        </tr>
+                        <tr>
+                          <td>reservation id:</td>
+                          <td>${resId}</td>
+                        </tr>
+                      </table>
+                      <h4>For more information please contact the barber.</h4>
+                      <br>
+                      <h5>details about the barber can be found in the website's booking page</h5>`;
+
+                  Email.send({
+                    Host: "smtp.gmail.com",
+                    Username: "mybarbershop17@gmail.com",
+                    Password: "yuval1234",
+                    To: targetEmail,
+                    From: "mybarbershop17@gmail.com",
+                    Subject: "MyBarber reservation has been delayed",
+                    Body: bodyToSend,
+                  });
+                });
               });
             })
             .catch((error) => {
