@@ -179,7 +179,46 @@ auth.onAuthStateChanged((user) => {
           // delay in 30 min
           let halfAnHourInSec = 30 * 60000;
           let delayedDate = new Date(docDate.getTime() + halfAnHourInSec);
-          resRef.update({ date: delayedDate });
+          resRef
+            .update({ date: delayedDate })
+            .then(() => {
+              // sending mail
+              const user = auth.currentUser;
+              let bodyToSend = `<h2>hello ${user.displayName}</h2>
+                <h4>we would like to inform you that your barber delayed your reservation.</h4>
+                <br>
+                <table>
+                  <tr>
+                    <td>old date:</td>
+                    <td>${docDate}</td>
+                  </tr>
+                  <tr>
+                    <td><b>new date:</b></td>
+                    <td>${delayedDate}</td>
+                  </tr>
+                  <tr>
+                    <td>reservation id:</td>
+                    <td>${resId}</td>
+                  </tr>
+                </table>
+                <h4>For more information please contact the barber.</h4>
+                <br>
+                <h5>details about the barber can be found in the website's booking page</h5>`;
+
+              Email.send({
+                Host: "smtp.gmail.com",
+                Username: "mybarbershop17@gmail.com",
+                Password: "yuval1234",
+                To: user.email,
+                From: "mybarbershop17@gmail.com",
+                Subject: "MyBarber reservation has been delayed",
+                Body: bodyToSend,
+              });
+            })
+            .catch((error) => {
+              // The document probably doesn't exist.
+              console.error("Error updating document: ", error);
+            });
 
           // resting chosen cell table
           previousCellClicked.style.backgroundColor =
@@ -194,59 +233,3 @@ auth.onAuthStateChanged((user) => {
     });
   }
 });
-
-// document.querySelectorAll('#timeTable td')
-// .forEach(tableCell => tableCell.addEventListener("mouseover", () => {
-//     previousSpotHover=tableCell.innerHTML;
-//     tableCell.innerHTML='Ronen, Regular';
-// },false));
-
-// document.querySelectorAll('#timeTable td')
-// .forEach(tableCell => tableCell.addEventListener("mouseout", () => {
-//     tableCell.innerHTML=previousSpotHover;
-
-// },false));
-
-// document.querySelectorAll('#timeTable td')
-// .forEach(tableCell => tableCell.addEventListener("click", () => {
-//     console.log(tableCell.innerHTML);
-//     if(previousCellClicked){
-//         previousCellClicked.style.backgroundColor = "rgba(85, 107, 47, 0.904)";
-//     }
-
-//     if(previousCellClicked!=tableCell){
-//         previousCellClicked=tableCell;
-//         tableCell.style.backgroundColor = "rgb(50, 158, 231)";
-//     }
-//     else{
-//         previousCellClicked=null;
-//     }
-// },false));
-
-// document.querySelectorAll('#timeTable td')
-// .forEach(tableCell => tableCell.addEventListener("mouseover", () => {
-//     previousSpotHover=tableCell.innerHTML;
-//     tableCell.innerHTML='Ronen, Regular';
-// },false));
-
-// document.querySelectorAll('#timeTable td')
-// .forEach(tableCell => tableCell.addEventListener("mouseout", () => {
-//     tableCell.innerHTML=previousSpotHover;
-
-// },false));
-
-// document.querySelectorAll('#timeTable td')
-// .forEach(tableCell => tableCell.addEventListener("click", () => {
-//     console.log(tableCell.innerHTML);
-//     if(previousCellClicked){
-//         previousCellClicked.style.backgroundColor = "rgba(85, 107, 47, 0.904)";
-//     }
-
-//     if(previousCellClicked!=tableCell){
-//         previousCellClicked=tableCell;
-//         tableCell.style.backgroundColor = "rgb(50, 158, 231)";
-//     }
-//     else{
-//         previousCellClicked=null;
-//     }
-// },false));

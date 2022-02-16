@@ -291,6 +291,54 @@ function addReservation() {
                     db.doc(`/reservations/${newRes.id}`)
                   ),
                 });
+
+                // sending mail
+                const user = auth.currentUser;
+                const haircutDescription =
+                  selectedHaircut.options[selectedHaircut.selectedIndex].value;
+                const haircutPrice =
+                  selectedHaircut.options[selectedHaircut.selectedIndex]
+                    .getAttribute("price");
+                let bodyToSend = 
+                `<h2>hello ${user.displayName}</h2>
+                <h4>your reservation has been approved.</h4>
+                <br>
+                <table>
+                  <tr>
+                    <td>date:</td>
+                    <td>${chosenDate}</td>
+                  </tr>
+                  <tr>
+                    <td>barber name:</td>
+                    <td>${barberData.data().fullName}</td>
+                  </tr>
+                  <tr>
+                    <td>note for barber:</td>
+                    <td>${noteToDb}</td>
+                  </tr>
+                  <tr>
+                    <td>haircut style:</td>
+                    <td>${haircutDescription}</td>
+                  </tr>
+                  <tr>
+                    <td>price:</td>
+                    <td>${haircutPrice}</td>
+                  </tr>
+                  <tr>
+                    <td>reservation id:</td>
+                    <td>${newRes.id}</td>
+                  </tr>
+                </table>`;
+
+                Email.send({
+                  Host: "smtp.gmail.com",
+                  Username: "mybarbershop17@gmail.com",
+                  Password: "yuval1234",
+                  To: user.email,
+                  From: "mybarbershop17@gmail.com",
+                  Subject: "MyBarber reservation is approved",
+                  Body: bodyToSend,
+                });
               });
           })
           .catch((error) => {
@@ -339,6 +387,9 @@ function initPayPalButton() {
           paypalElement.innerHTML = "<h3>Thank you for your payment!</h3>";
 
           addReservation();
+
+          // reset page
+          barberInfo.hidden = true;
         });
       },
       onCancel: function (data, actions) {
