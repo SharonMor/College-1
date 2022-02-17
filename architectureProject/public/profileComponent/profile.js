@@ -15,6 +15,7 @@ auth.onAuthStateChanged((user) => {
     unsubscribe = usersRef
       .where("email", "==", user.email)
       .onSnapshot((querySnapshot) => {
+        let userId = querySnapshot.docs[0].id;
         let userData = querySnapshot.docs[0].data();
         let isBarberName = userData.isBarber ? "Barber" : "Customer";
         profileName.innerHTML = `${userData.fullName} (${isBarberName})`;
@@ -23,7 +24,7 @@ auth.onAuthStateChanged((user) => {
         profilePhone.innerHTML = userData.phone;
 
         reservationsList.innerHTML = "";
-        let resRefList = querySnapshot.docs[0].data().reservations;
+        let resRefList = userData.reservations;
         resRefList.forEach((resRef) => {
           // will be reservations = "reservations"
           let reservations = resRef.parent.id;
@@ -38,6 +39,13 @@ auth.onAuthStateChanged((user) => {
               let targetId = userData.isBarber
                 ? docData.customerId
                 : docData.barberId;
+
+              // handling the case if reservation is created by the barber as a customer
+              // so we want to show the properties of the barber
+              if (docData.customerId == userId) {
+                targetId = docData.barberId;
+              }
+              
               let customerRef = usersRef.doc(targetId);
               customerRef.get().then((customerDoc) => {
                 let customerName = customerDoc.data().fullName;

@@ -59,6 +59,7 @@ auth.onAuthStateChanged((user) => {
           tableCellIdToResId.clear();
           if (querySnapshot.size == 1) {
             let resRefList = querySnapshot.docs[0].data().reservations;
+            let barberId = querySnapshot.docs[0].id;
             resRefList.forEach((resRef) => {
               // will be reservations = "reservations"
               let reservations = resRef.parent.id;
@@ -68,35 +69,36 @@ auth.onAuthStateChanged((user) => {
               let resDoc = db.collection(reservations).doc(resId);
               resDoc.onSnapshot((doc) => {
                 let docData = doc.data();
-                let customerNote = docData.note;
 
-                // filtering only current day
-                let docDate = docData.date.toDate();
-                let chosenDate = new Date(dateInput.value);
-                if (areDatesEqual(docDate, chosenDate)) {
-                  // converting time (e.g 8:30 --> 8.5)
-                  let hourNum = docDate.getHours();
-                  hourNum += docDate.getMinutes() == 0 ? 0 : 0.5;
-                  const index = getIndexByHour(hourNum);
-                  let busyCell = document.getElementById(`spot${index}`);
-                  busyCell.style.backgroundColor = "#ffb6c1";
-                  busyCell.style.pointerEvents = "auto";
-                  busyCell.title = customerNote;
-                  tableCellIdToResId.set(`spot${index}`, resId);
+                // if reservation isn't created by the barber as a customer
+                // i.e filter out reservations done by me (barber)
+                if (docData.customerId != barberId) {
+                  let customerNote = docData.note;
 
-                  // change name to the appropriate customer user.
-                  let busyCellName = document.getElementById(
-                    `spot${index}name`
-                  );
-                  let customerRef = usersRef.doc(docData.customerId);
-                  customerRef.get().then((customerDoc) => {
-                    let customerName = customerDoc.data().fullName;
-                    busyCellName.innerHTML = customerName;
-                    console.log("customerName is: ", customerName);
-                  });
+                  // filtering only current day
+                  let docDate = docData.date.toDate();
+                  let chosenDate = new Date(dateInput.value);
+                  if (areDatesEqual(docDate, chosenDate)) {
+                    // converting time (e.g 8:30 --> 8.5)
+                    let hourNum = docDate.getHours();
+                    hourNum += docDate.getMinutes() == 0 ? 0 : 0.5;
+                    const index = getIndexByHour(hourNum);
+                    let busyCell = document.getElementById(`spot${index}`);
+                    busyCell.style.backgroundColor = "#ffb6c1";
+                    busyCell.style.pointerEvents = "auto";
+                    busyCell.title = customerNote;
+                    tableCellIdToResId.set(`spot${index}`, resId);
 
-                  console.log("index is: ", index);
-                  console.log(docDate.getHours(), docDate.getMinutes());
+                    // change name to the appropriate customer user.
+                    let busyCellName = document.getElementById(
+                      `spot${index}name`
+                    );
+                    let customerRef = usersRef.doc(docData.customerId);
+                    customerRef.get().then((customerDoc) => {
+                      let customerName = customerDoc.data().fullName;
+                      busyCellName.innerHTML = customerName;
+                    });
+                  }
                 }
               });
             });
@@ -170,6 +172,15 @@ auth.onAuthStateChanged((user) => {
 
     delayBtn.addEventListener("click", () => {
       let cellId = previousCellClicked.id;
+
+      if (!isCellDelayable(cellId)) {
+        alert(
+          "Warning! you can't delay selected time\n" +
+            "selected time may be last hour OR the next time slot is taken"
+        );
+        return;
+      }
+
       let resId = tableCellIdToResId.get(cellId);
       let resRef = reservationsRef.doc(resId);
 
@@ -183,8 +194,10 @@ auth.onAuthStateChanged((user) => {
           resRef
             .update({ date: delayedDate })
             .then(() => {
+              // updating map
+              tableCellIdToResId.delete(cellId);
+
               // sending mail
-              // const user = auth.currentUser;
               resRef.get().then((resDoc) => {
                 let targetCustomerRef = usersRef.doc(resDoc.data().customerId);
 
@@ -192,8 +205,7 @@ auth.onAuthStateChanged((user) => {
                   let targetName = targetDoc.data().fullName;
                   let targetEmail = targetDoc.data().email;
 
-                  let bodyToSend = 
-                    `<h2>hello ${targetName}</h2>
+                  let bodyToSend = `<h2>hello ${targetName}</h2>
                       <h4>we would like to inform you that your barber delayed your reservation.</h4>
                       <br>
                       <table>
@@ -244,3 +256,17 @@ auth.onAuthStateChanged((user) => {
     });
   }
 });
+
+function isCellDelayable(cellId) {
+  // `spot${index}` ==> cellIndex = index
+  let cellIndex = cellId.substr(4);
+  let nextCellIndex = parseInt(cellIndex) + 1;
+  let nextCellId = `spot${nextCellIndex}`;
+
+  let lastCellIndex = getIndexByHour(endHour);
+  let lastCellId = `spot${lastCellIndex}`;
+
+  // if there is reservation registered on next cell
+  if (tableCellIdToResId.get(nextCellId) || cellId == lastCellId) return false;
+  return true;
+}

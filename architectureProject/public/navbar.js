@@ -96,7 +96,7 @@ barberToggle.addEventListener(
 );
 
 phoneNumber.addEventListener("input", () => {
-  const phoneRegex = new RegExp("[0-9]{3}-[0-9]{7}");
+  const phoneRegex = new RegExp("^05[0-9]{1}-[0-9]{7}");
   const match = phoneNumber.value.match(phoneRegex);
 
   continueDialogBtn.disabled = !(match && phoneNumber.value === match[0]);
