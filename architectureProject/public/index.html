@@ -36,16 +36,15 @@
         </div>
     </nav>
 
-    <div id="signUpDialog" class="dialog" hidden="true">
+    <div id="signUpDialog" class="dialog" hidden>
         <span id="xDialog" class="close" title="Close Window">&times;</span>
-        <form class="dialog-content">
+        <div class="dialog-content">
             <div class="container">
                 <h1>Sign Up</h1>
                 <p>Please fill in this form to create an account.</p>
                 <label for="phone"><b>Phone Number</b></label><br>
                 <input type="tel" id="phone" name="phone" placeholder="05x-xxxxxxx" pattern="^05[0-9]{1}-[0-9]{7}"
                     required>
-
                 <br>
                 <label>
                     <input type="checkbox" id="barberToggle" name="barber" style="margin-bottom:15px"> Are you a barber?
@@ -60,7 +59,7 @@
                     <button id="continueDialogBtn" class="btn-primary signupbtn">Continue</button>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 
 

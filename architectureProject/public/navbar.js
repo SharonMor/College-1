@@ -21,10 +21,8 @@ let avatarOriginSrc = avatar.src;
 
 ///// User Authentication /////
 /// Sign in event handlers
-// TODO: consider change to signInWithReDirect
 navSignUpBtn.addEventListener("click", () => {
   auth.signInWithPopup(provider);
-  // auth.signInWithRedirect(provider);
 });
 
 navSignOutBtn.addEventListener("click", () => {
@@ -68,7 +66,6 @@ auth.onAuthStateChanged((user) => {
         console.log(`Error getting user: ${user.email}`, error);
       });
 
-    // dialog.hidden = true;
     navSignUpBtn.hidden = true;
     navSignOutBtn.hidden = false;
 
@@ -114,17 +111,17 @@ function addUserIfNotExist(user) {
       // if user isn't exists -> adding new user
       if (querySnapshot.size == 0) {
         console.log(`adding ${user.email} to FireStore`);
-        usersRef.add({
-          isBarber: barberToggle.checked,
-          aboutMe: aboutMeText,
-          email: user.email,
-          fullName: user.displayName,
-          profileImg: user.photoURL,
-          phone: phoneNumber.value,
-          reservations: [],
-        });
-
-        dialog.hidden = true;
+        usersRef
+          .add({
+            isBarber: barberToggle.checked,
+            aboutMe: aboutMeText,
+            email: user.email,
+            fullName: user.displayName,
+            profileImg: user.photoURL,
+            phone: phoneNumber.value,
+            reservations: [],
+          })
+          .then(() => (dialog.hidden = true));
       }
     })
     .catch((error) => {

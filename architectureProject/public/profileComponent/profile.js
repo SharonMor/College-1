@@ -23,8 +23,10 @@ auth.onAuthStateChanged((user) => {
         profileEmail.innerHTML = userData.email;
         profilePhone.innerHTML = userData.phone;
 
-        reservationsList.innerHTML = "";
         let resRefList = userData.reservations;
+        if (resRefList.length != 0) {
+          reservationsList.innerHTML = "";
+        }
         resRefList.forEach((resRef) => {
           // will be reservations = "reservations"
           let reservations = resRef.parent.id;
@@ -45,13 +47,21 @@ auth.onAuthStateChanged((user) => {
               if (docData.customerId == userId) {
                 targetId = docData.barberId;
               }
-              
+
               let customerRef = usersRef.doc(targetId);
               customerRef.get().then((customerDoc) => {
+
+                // filtering out non updated reservations
+                let resDbDate = docData.date;
+                const currentServerDate = firebase.firestore.Timestamp.now();
+                if (resDbDate < currentServerDate) {
+                  return;
+                }
+
                 let customerName = customerDoc.data().fullName;
-                let resDate = docData.date.toDate().toISOString().split("T")[0];
-                let resHours = docData.date.toDate().getHours();
-                let resMinutes = docData.date.toDate().getMinutes();
+                let resDate = resDbDate.toDate().toISOString().split("T")[0];
+                let resHours = resDbDate.toDate().getHours();
+                let resMinutes = resDbDate.toDate().getMinutes();
                 resMinutes = resMinutes == 0 ? "00" : resMinutes;
                 let resHtml =
                   `<tr id=${doc.id}>` +
