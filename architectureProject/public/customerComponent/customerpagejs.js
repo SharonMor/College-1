@@ -15,6 +15,8 @@ const barberSpeech = document.getElementById("barberSpeech");
 const paypalElement = document.getElementById("paypal-button-container");
 const paypalBtnWrapper = document.getElementById("paypalBtnWrapper");
 
+let chosenBarberIndex;
+
 ///// Firestore /////
 // pull data for barbers select
 // usersRef is already initialized in navbar.js
@@ -28,6 +30,9 @@ auth.onAuthStateChanged((user) => {
     unsubscribe = usersRef
       .where("isBarber", "==", true)
       .onSnapshot((querySnapshot) => {
+        // save last chosen barber before re-render select
+        chosenBarberIndex = barbersSelect.selectedIndex;
+
         // Map results to an array of option elements
         const items = querySnapshot.docs.map((doc) => {
           const barberName = doc.data().fullName;
@@ -36,6 +41,10 @@ auth.onAuthStateChanged((user) => {
         barbersSelect.innerHTML =
           '<option value="notSelected" selected disabled>Choose barber</option>';
         barbersSelect.innerHTML += items.join("");
+
+        // if an update has been accrued in barbers DB -> re choosing the selected barber
+        if (chosenBarberIndex)
+          barbersSelect[chosenBarberIndex].selected = true;
       });
   } else {
     // Unsubscribe when the user signs out
@@ -150,9 +159,6 @@ auth.onAuthStateChanged((user) => {
                     let busyCell = document.getElementById(`spot${index}`);
                     busyCell.style.backgroundColor = "#ffb6c1";
                     busyCell.style.pointerEvents = "none";
-
-                    console.log("index is: ", index);
-                    console.log(docDate.getHours(), docDate.getMinutes());
                   }
                 })
                 .catch((error) => {
@@ -232,7 +238,8 @@ selectedHaircut.addEventListener("change", () => {
 
 function addReservation() {
   const user = firebase.auth().currentUser;
-  const chosenBarberIndex = barbersSelect.selectedIndex;
+  // saving the global variable to last selected
+  chosenBarberIndex = barbersSelect.selectedIndex;
 
   if (user) {
     reservationsRef = db.collection("reservations");
@@ -338,13 +345,15 @@ function addReservation() {
 
                 Email.send({
                   Host: "smtp.gmail.com",
-                  Username: "mybarbershop17@gmail.com",
-                  Password: "yuval1234",
+                  Username: "mybarbershopproject@gmail.com",
+                  Password: "Project123",
                   To: user.email,
-                  From: "mybarbershop17@gmail.com",
+                  From: "mybarbershopproject@gmail.com",
                   Subject: "MyBarber reservation is approved",
                   Body: bodyToSend,
-                });
+                })
+                  .then(() => console.log("mail sent successfully"))
+                  .catch((error) => console.log(`Error sending mail ${error}`));
               });
           })
           .catch((error) => {
@@ -390,18 +399,17 @@ function initPayPalButton() {
       onApprove: function (data, actions) {
         return actions.order.capture().then(function (orderData) {
           // Show a success message within this page, e.g.
-          paypalElement.innerHTML = "<h3>Thank you for your payment!</h3>";
+          paypalElement.innerHTML =
+            "<h3 style='color: black;'>Thank you for your payment!</h3>" +
+            "<br><h6 style='color: black;'>If you want to place another order, refresh the page</h6>";
 
           addReservation();
-
-          // reset page
-          barberInfo.hidden = true;
         });
       },
       onCancel: function (data, actions) {
         paypalElement.innerHTML =
-          "<h3>The payment has been canceled!</h3>" +
-          "<br><h6>If you want to place an order refresh the page</h6>";
+          "<h3 style='color: black;'>The payment has been canceled!</h3>" +
+          "<br><h6 style='color: black;'>If you want to place an order refresh the page</h6>";
       },
       onError: function (err) {
         console.log(err);

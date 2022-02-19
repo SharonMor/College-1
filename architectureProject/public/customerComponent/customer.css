@@ -116,12 +116,12 @@ input::placeholder {
 }
 
 .paypalBtnWrapper {
-  background-color: rgba(140, 140, 140, 0.55);
+  background-color: rgba(255, 255, 255, 0.8);
   border-top-left-radius: 10%;
   border-top-right-radius: 10%;
   border-bottom-left-radius: 5.44rem;
   border-bottom-right-radius: 5.44rem;
-  padding: 10px 0;
+  padding: 2.5%;
   margin: auto;
   align-items: center;
 }

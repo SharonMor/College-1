@@ -50,7 +50,6 @@ auth.onAuthStateChanged((user) => {
 
               let customerRef = usersRef.doc(targetId);
               customerRef.get().then((customerDoc) => {
-
                 // filtering out non updated reservations
                 let resDbDate = docData.date;
                 const currentServerDate = firebase.firestore.Timestamp.now();
@@ -181,11 +180,13 @@ function sendMail(emailTo, displayName, resDate, resId) {
 
   Email.send({
     Host: "smtp.gmail.com",
-    Username: "mybarbershop17@gmail.com",
-    Password: "yuval1234",
+    Username: "mybarbershopproject@gmail.com",
+    Password: "Project123",
     To: emailTo,
-    From: "mybarbershop17@gmail.com",
+    From: "mybarbershopproject@gmail.com",
     Subject: "MyBarber reservation has been canceled",
     Body: bodyToSend,
-  });
+  })
+    .then(() => console.log("mail sent successfully"))
+    .catch((error) => console.log(`Error sending mail ${error}`));
 }

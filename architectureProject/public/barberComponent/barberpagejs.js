@@ -228,13 +228,17 @@ auth.onAuthStateChanged((user) => {
 
                   Email.send({
                     Host: "smtp.gmail.com",
-                    Username: "mybarbershop17@gmail.com",
-                    Password: "yuval1234",
+                    Username: "mybarbershopproject@gmail.com",
+                    Password: "Project123",
                     To: targetEmail,
-                    From: "mybarbershop17@gmail.com",
+                    From: "mybarbershopproject@gmail.com",
                     Subject: "MyBarber reservation has been delayed",
                     Body: bodyToSend,
-                  });
+                  })
+                    .then(() => console.log("mail sent successfully"))
+                    .catch((error) =>
+                      console.log(`Error sending mail ${error}`)
+                    );
                 });
               });
             })
