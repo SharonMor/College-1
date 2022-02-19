@@ -4,6 +4,7 @@
     "email": "",
     "fullName": "",
     "phone": "",
+    "profileImg": "",
     "reservation": [
         "/reservations/<uuid0>",
         "/reservations/<uuid1>"
