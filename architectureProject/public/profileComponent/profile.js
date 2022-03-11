@@ -12,7 +12,7 @@ auth.onAuthStateChanged((user) => {
     let resList = [];
 
     unsubscribe = getUserQuery(user.email).onSnapshot((querySnapshot) => {
-      const queriedDoc = validateAndGetSingleSnapshot(querySnapshot);
+      const queriedDoc = validateAndGetSingleDoc(querySnapshot);
       if (!queriedDoc) return;
 
       let userId = queriedDoc.id;

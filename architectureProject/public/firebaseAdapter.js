@@ -1,17 +1,9 @@
 const usersRef = db.collection("users");
 const reservationsRef = db.collection("reservations");
 
-class QueryParms {
-  constructor(isBarber, email) {
-    this.isBarber = isBarber;
-    this.email = email;
-  }
-}
-
 ///^ Getters ^///
 /**
  * @param {String} userId
- *
  * @returns {Promise} Promise of get user in db
  */
 function getUser(userId) {
@@ -28,17 +20,22 @@ function getUser(userId) {
 }
 
 const getUserQuery = (email) => usersRef.where("email", "==", email);
-const getBarberQuery = (email) =>
-  usersRef.where("isBarber", "==", true).where("email", "==", email);
+const barbersQuery = usersRef.where("isBarber", "==", true);
+const getBarberQuery = (name) => barbersQuery.where("fullName", "==", name);
 
-function validateAndGetSingleSnapshot(querySnapshot) {
+/**
+ * checks weather there is only one doc in the given querySnapshot.
+ * @param {QuerySnapshot} querySnapshot 
+ * @returns the first doc if exists, else null.
+ */
+function validateAndGetSingleDoc(querySnapshot) {
   const queriedDoc = querySnapshot.docs[0];
-  if (isSingleResult && queriedDoc.exists) return queriedDoc;
+  if (_isSingleResult && queriedDoc.exists) return queriedDoc;
 
   return null;
 }
 
-function isSingleResult(querySnapshot) {
+function _isSingleResult(querySnapshot) {
   switch (querySnapshot.size) {
     case 1:
       return true;
