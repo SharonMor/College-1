@@ -9,34 +9,32 @@ const cancelBtn = document.getElementById("cancelBtn");
 let unsubscribe;
 auth.onAuthStateChanged((user) => {
   if (user) {
-    let resList = [];
-
     unsubscribe = getUserQuery(user.email).onSnapshot((querySnapshot) => {
       const queriedDoc = validateAndGetSingleDoc(querySnapshot);
       if (!queriedDoc) return;
 
-      let userId = queriedDoc.id;
-      let userData = queriedDoc.data();
-      let isBarberName = userData.isBarber ? "Barber" : "Customer";
+      const userId = queriedDoc.id;
+      const userData = queriedDoc.data();
+      const isBarberName = userData.isBarber ? "Barber" : "Customer";
       profileName.innerHTML = `${userData.fullName} (${isBarberName})`;
       profilePic.src = userData.profileImg;
       profileEmail.innerHTML = userData.email;
       profilePhone.innerHTML = userData.phone;
 
-      let resRefList = userData.reservations;
+      const resRefList = userData.reservations;
       if (resRefList.length != 0) {
         reservationsList.innerHTML = "";
       }
       resRefList.forEach((resRef) => {
         // will be reservations = "reservations"
-        let reservations = resRef.parent.id;
-        let resId = resRef.id;
+        const reservations = resRef.parent.id;
+        const resId = resRef.id;
 
         // resDoc holds the actual doc in db
-        let resDoc = reservationsRef.doc(resId);
+        const resDoc = db.collection(reservations).doc(resId);
         resDoc.onSnapshot((doc) => {
           if (doc.exists) {
-            let reservationData = doc.data();
+            const reservationData = doc.data();
             // could be customer/barber
             let targetId = userData.isBarber
               ? reservationData.customerId
@@ -50,24 +48,24 @@ auth.onAuthStateChanged((user) => {
 
             getUser(targetId).then((userTargetDoc) => {
               // filtering out non updated reservations
-              let resDbDate = reservationData.date;
+              const resDbDate = reservationData.date;
               const currentServerDate = firebase.firestore.Timestamp.now();
               if (resDbDate < currentServerDate) {
                 return;
               }
 
-              let customerName = userTargetDoc.data().fullName;
-              let resDate = resDbDate.toDate().toISOString().split("T")[0];
-              let resHours = resDbDate.toDate().getHours();
-              let resMinutes = resDbDate.toDate().getMinutes();
+              const customerName = userTargetDoc.data().fullName;
+              const resDate = resDbDate.toDate().toISOString().split("T")[0];
+              const resHours = resDbDate.toDate().getHours();
+              const resMinutes = resDbDate.toDate().getMinutes();
               resMinutes = resMinutes == 0 ? "00" : resMinutes;
-              let resHtml =
+              const resHtml =
                 `<tr id=${doc.id}>` +
                 `<td><span class="resName">${customerName}</span></td>` +
                 `<td><span class="resDate">${resDate}, ${resHours}:${resMinutes}</span></td>` +
                 `<td><span class="resId">id: ${doc.id}</span></td></tr>`;
 
-              let dtResElement = document.getElementById(doc.id);
+              const dtResElement = document.getElementById(doc.id);
               if (dtResElement) {
                 dtResElement.outerHTML = resHtml;
               } else {
@@ -77,7 +75,7 @@ auth.onAuthStateChanged((user) => {
           } else {
             console.log(`reservation ${doc.id} has been deleted!`);
             // removing element from DOM
-            let dtResElement = document.getElementById(doc.id);
+            const dtResElement = document.getElementById(doc.id);
             if (dtResElement) dtResElement.remove();
           }
         });
@@ -89,10 +87,9 @@ auth.onAuthStateChanged((user) => {
   }
 });
 
-
 // adding event listener to cancel
 cancelBtn.addEventListener("click", () => {
-  let resId = resInputId.value;
+  const resId = resInputId.value;
   if (!resId) {
     alert("No such reservation! please rewrite the correct id");
     return;
@@ -140,7 +137,7 @@ cancelBtn.addEventListener("click", () => {
 });
 
 function prepareAndSendMail(emailTo, displayName, resDate, resId) {
-  let bodyToSend = `<h2>hello ${displayName}</h2>
+  const bodyToSend = `<h2>hello ${displayName}</h2>
     <h4>we would like to inform you that your reservation has been cancelled.</h4>
     <br>
     <table>

@@ -7,7 +7,7 @@ const offset = 0.5;
 // returns index of cell by offset (by default = 0.5)
 // e.g (hour = 17, offset = 0.5) => 19
 // offset is the time jump between hours.
-let getIndexByHour = (hour, startTime = startHour, offsetNum = offset) =>
+const getIndexByHour = (hour, startTime = startHour, offsetNum = offset) =>
   (hour - startTime) / offsetNum + 1;
 
 /**
@@ -32,7 +32,7 @@ function generateTable(isBarber = false) {
     const isBelow10 = i < 10;
     let hour;
     let rowNum;
-    let index = getIndexByHour(i);
+    const index = getIndexByHour(i);
     let tdInnerHtml;
 
     if (isFraction) hour = isBelow10 ? `0${i - offset}:30` : `${i - offset}:30`;

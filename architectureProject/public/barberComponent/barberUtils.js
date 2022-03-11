@@ -1,11 +1,11 @@
 function isCellDelayable(cellId) {
   // `spot${index}` ==> cellIndex = index
-  let cellIndex = cellId.substr(4);
-  let nextCellIndex = parseInt(cellIndex) + 1;
-  let nextCellId = `spot${nextCellIndex}`;
+  const cellIndex = cellId.substr(4);
+  const nextCellIndex = parseInt(cellIndex) + 1;
+  const nextCellId = `spot${nextCellIndex}`;
 
-  let lastCellIndex = getIndexByHour(endHour);
-  let lastCellId = `spot${lastCellIndex}`;
+  const lastCellIndex = getIndexByHour(endHour);
+  const lastCellId = `spot${lastCellIndex}`;
 
   // if there is reservation registered on next cell
   if (tableCellIdToResId.get(nextCellId) || cellId == lastCellId) return false;
@@ -13,7 +13,7 @@ function isCellDelayable(cellId) {
 }
 
 function prepareAndSendMail(emailTo, displayName, resOldDate, resNewDate, resId) {
-  let bodyToSend = `<h2>hello ${displayName}</h2>
+  const bodyToSend = `<h2>hello ${displayName}</h2>
   <h4>we would like to inform you that your barber delayed your reservation.</h4>
   <br>
   <table>

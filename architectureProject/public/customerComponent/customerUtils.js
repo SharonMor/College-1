@@ -27,7 +27,7 @@ const getHaircutsValueToImgId = () => {
 };
 
 function prepareAndSendMail(emailTo, displayName, resDate, barberName, resId) {
-  let bodyToSend = `<h2>hello ${displayName}</h2>
+  const bodyToSend = `<h2>hello ${displayName}</h2>
     <h4>your reservation has been approved.</h4>
     <br>
     <table>

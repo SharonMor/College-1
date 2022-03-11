@@ -48,9 +48,9 @@ auth.onAuthStateChanged((user) => {
 });
 
 // setting date fixed times
-let nextYearDate = getNextYearDate(new Date());
-let currentParsedDate = new Date().toISOString().split("T")[0];
-let nextYearParsedDate = nextYearDate.toISOString().split("T")[0];
+const nextYearDate = getNextYearDate(new Date());
+const currentParsedDate = new Date().toISOString().split("T")[0];
+const nextYearParsedDate = nextYearDate.toISOString().split("T")[0];
 
 dateInput.value = currentParsedDate;
 dateInput.min = currentParsedDate;
@@ -112,33 +112,29 @@ auth.onAuthStateChanged((user) => {
         tableCell.style.backgroundColor = GREEN_CELL;
         tableCell.style.pointerEvents = "auto";
       });
-
-      // getting barber name
-      let selectedBarber = getSelectedBarber();
-
       // Query reservations of a barber
       unsubscribe = getBarberQuery(getSelectedBarber()).onSnapshot(
         (querySnapshot) => {
           const queriedDoc = validateAndGetSingleDoc(querySnapshot);
           if (!queriedDoc) return;
 
-          let resRefList = queriedDoc.data().reservations;
+          const resRefList = queriedDoc.data().reservations;
           resRefList.forEach((resRef) => {
             // will be reservations = "reservations"
-            let reservations = resRef.parent.id;
-            let docId = resRef.id;
+            const reservations = resRef.parent.id;
+            const docId = resRef.id;
             // ref holds the actual doc in db
-            let docRef = db.collection(reservations).doc(docId);
+            const docRef = db.collection(reservations).doc(docId);
             docRef
               .get()
               .then((doc) => {
                 // filtering only current day
-                let docDate = doc.data().date.toDate();
-                let chosenDate = new Date(dateInput.value);
+                const docDate = doc.data().date.toDate();
+                const chosenDate = new Date(dateInput.value);
                 if (!areDatesEqual(docDate, chosenDate)) return;
 
                 const index = getIndexByUserDate(docDate);
-                let busyCell = document.getElementById(`spot${index}`);
+                const busyCell = document.getElementById(`spot${index}`);
                 busyCell.style.backgroundColor = RED_CELL;
                 busyCell.style.pointerEvents = "none";
               })
@@ -227,7 +223,7 @@ function addReservation() {
               validateAndGetSingleDoc(barberQuerySnapshot);
             if (!barberQueriedDoc) return;
 
-            const barberIdToDb = barberQueriedDoc.id;
+            barberIdToDb = barberQueriedDoc.id;
             reservationsRef
               .add({
                 date: dateToDb,

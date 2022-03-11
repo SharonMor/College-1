@@ -16,8 +16,7 @@ const barberToggle = document.getElementById("barberToggle");
 
 continueDialogBtn.disabled = true;
 freeText.hidden = true;
-// let usersRef;
-let avatarOriginSrc = avatar.src;
+const avatarOriginSrc = avatar.src;
 
 ///// User Authentication /////
 /// Sign in event handlers
@@ -26,8 +25,8 @@ navSignUpBtn.addEventListener("click", () => {
 });
 
 navSignOutBtn.addEventListener("click", () => {
-  let signOutPromise = auth.signOut();
-  let homeLocation = `${window.location.origin}/index.html`;
+  const signOutPromise = auth.signOut();
+  const homeLocation = `${window.location.origin}/index.html`;
 
   signOutPromise
     .then((onSignedOut) => {
@@ -36,19 +35,13 @@ navSignOutBtn.addEventListener("click", () => {
     .catch((error) => console.log(`Error signing out: ${error}`));
 });
 
-xDialog.onclick = () => {
-  clearUser();
-};
-cancelDialogBtn.onclick = () => {
-  clearUser();
-};
+xDialog.onclick = () => clearUser();
+cancelDialogBtn.onclick = () => clearUser();
 
 auth.onAuthStateChanged((user) => {
   if (user) {
     // signed in
     // open signup dialog if user isn't registered
-    // usersRef = db.collection("users");
-
     usersRef
       .where("email", "==", user.email)
       .get()
@@ -100,13 +93,11 @@ phoneNumber.addEventListener("input", () => {
 });
 
 function addUserIfNotExist(user) {
-  // usersRef = db.collection("users");
-
   usersRef
     .where("email", "==", user.email)
     .get()
     .then((querySnapshot) => {
-      let aboutMeText = barberToggle.checked ? freeText.value : "";
+      const aboutMeText = barberToggle.checked ? freeText.value : "";
 
       // if user isn't exists -> adding new user
       if (querySnapshot.size == 0) {
@@ -137,7 +128,7 @@ auth.onAuthStateChanged((user) => {
 });
 
 function redirectToProfile() {
-  let profileLocation = `${window.location.origin}/profileComponent/profile.html`;
+  const profileLocation = `${window.location.origin}/profileComponent/profile.html`;
 
   window.location.href = profileLocation;
 }
