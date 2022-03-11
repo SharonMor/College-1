@@ -4,22 +4,15 @@ const signOutNotify = document.getElementById("signOutNotify");
 
 auth.onAuthStateChanged((user) => {
   if (user) {
-    // Database Reference
-    usersRef = db.collection("users");
+    getUserQuery(user.email).onSnapshot((querySnapshot) => {
+      const queriedDoc = validateAndGetSingleDoc(querySnapshot);
+      if (!queriedDoc) return;
 
-    usersRef
-      .where("email", "==", user.email)
-      .onSnapshot((querySnapshot) => {
-        // if user exists
-        if (querySnapshot.size == 1) {
-          isBarber = querySnapshot.docs[0].data().isBarber;
-
-          barberBtn.hidden = !isBarber;
-          customerBtn.hidden = false;
-          signOutNotify.hidden = true;
-        }
-      });
-
+      isBarber = queriedDoc.data().isBarber;
+      barberBtn.hidden = !isBarber;
+      customerBtn.hidden = false;
+      signOutNotify.hidden = true;
+    });
   } else {
     customerBtn.hidden = true;
     barberBtn.hidden = true;
