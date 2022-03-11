@@ -40,9 +40,6 @@ const tableCellIdToResId = new Map();
 // modifying booked table cells, user is a barber of course
 auth.onAuthStateChanged((user) => {
   if (user) {
-    // Database Reference
-    usersRef = db.collection("users");
-
     checkBtn.addEventListener("click", () => {
       // clearing old busy cells
       allTableCells.forEach((tableCell) => {
@@ -166,10 +163,6 @@ allTableCells.forEach((tableCell) =>
 // handle delay haircut
 auth.onAuthStateChanged((user) => {
   if (user) {
-    // Database Reference
-    reservationsRef = db.collection("reservations");
-    usersRef = db.collection("users");
-
     delayBtn.addEventListener("click", () => {
       let cellId = previousCellClicked.id;
 
@@ -226,19 +219,9 @@ auth.onAuthStateChanged((user) => {
                       <br>
                       <h5>details about the barber can be found in the website's booking page</h5>`;
 
-                  Email.send({
-                    Host: "smtp.gmail.com",
-                    Username: "mybarbershopproject@gmail.com",
-                    Password: "Project123",
-                    To: targetEmail,
-                    From: "mybarbershopproject@gmail.com",
-                    Subject: "MyBarber reservation has been delayed",
-                    Body: bodyToSend,
-                  })
-                    .then(() => console.log("mail sent successfully"))
-                    .catch((error) =>
-                      console.log(`Error sending mail ${error}`)
-                    );
+                  const subjectToSend = "MyBarber reservation has been delayed";
+                  mailToSend = new Mail(targetEmail, subjectToSend, bodyToSend)
+                  sendMail(mailToSend);
                 });
               });
             })

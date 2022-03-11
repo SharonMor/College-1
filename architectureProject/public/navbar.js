@@ -16,7 +16,7 @@ const barberToggle = document.getElementById("barberToggle");
 
 continueDialogBtn.disabled = true;
 freeText.hidden = true;
-let usersRef;
+// let usersRef;
 let avatarOriginSrc = avatar.src;
 
 ///// User Authentication /////
@@ -47,7 +47,7 @@ auth.onAuthStateChanged((user) => {
   if (user) {
     // signed in
     // open signup dialog if user isn't registered
-    usersRef = db.collection("users");
+    // usersRef = db.collection("users");
 
     usersRef
       .where("email", "==", user.email)
@@ -100,7 +100,7 @@ phoneNumber.addEventListener("input", () => {
 });
 
 function addUserIfNotExist(user) {
-  usersRef = db.collection("users");
+  // usersRef = db.collection("users");
 
   usersRef
     .where("email", "==", user.email)

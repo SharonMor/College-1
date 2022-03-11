@@ -24,7 +24,7 @@ let unsubscribe;
 auth.onAuthStateChanged((user) => {
   if (user) {
     // Database Reference
-    usersRef = db.collection("users");
+    // usersRef = db.collection("users");
 
     // Query
     unsubscribe = usersRef
@@ -84,7 +84,7 @@ barbersSelect.addEventListener("change", () => {
 
   const user = firebase.auth().currentUser;
   if (user) {
-    usersRef = db.collection("users");
+    // usersRef = db.collection("users");
 
     // getting barber name
     const selectedBarber =
@@ -118,7 +118,7 @@ const allTableCells = document.querySelectorAll("#timeTable td");
 auth.onAuthStateChanged((user) => {
   if (user) {
     // Database Reference
-    usersRef = db.collection("users");
+    // usersRef = db.collection("users");
 
     checkBtn.addEventListener("click", () => {
       // clearing old busy cells
@@ -242,8 +242,8 @@ function addReservation() {
   chosenBarberIndex = barbersSelect.selectedIndex;
 
   if (user) {
-    reservationsRef = db.collection("reservations");
-    usersRef = db.collection("users");
+    // reservationsRef = db.collection("reservations");
+    // usersRef = db.collection("users");
 
     const noteToDb = customerNote.value;
     let customerIdToDb;
@@ -313,6 +313,7 @@ function addReservation() {
                   selectedHaircut.options[
                     selectedHaircut.selectedIndex
                   ].getAttribute("price");
+
                 let bodyToSend = `<h2>hello ${user.displayName}</h2>
                 <h4>your reservation has been approved.</h4>
                 <br>
@@ -343,17 +344,9 @@ function addReservation() {
                   </tr>
                 </table>`;
 
-                Email.send({
-                  Host: "smtp.gmail.com",
-                  Username: "mybarbershopproject@gmail.com",
-                  Password: "Project123",
-                  To: user.email,
-                  From: "mybarbershopproject@gmail.com",
-                  Subject: "MyBarber reservation is approved",
-                  Body: bodyToSend,
-                })
-                  .then(() => console.log("mail sent successfully"))
-                  .catch((error) => console.log(`Error sending mail ${error}`));
+                const subjectToSend = "MyBarber reservation is approved";
+                mailToSend = new Mail(user.email, subjectToSend, bodyToSend)
+                sendMail(mailToSend);
               });
           })
           .catch((error) => {
