@@ -85,8 +85,7 @@ barbersSelect.addEventListener("change", () => {
 
         barberMail.innerHTML = barberData.email;
         barberPhoneText.innerHTML = barberData.phone;
-        const phoneNumber = barberData.phone.replace("-", "");
-        barberWhatsappLink.href = `https://wa.me/972${phoneNumber}`;
+        barberWhatsappLink.href = `https://wa.me/972${barberData.phone}`;
         barberSpeech.innerHTML = barberData.aboutMe;
       })
       .catch((error) => {

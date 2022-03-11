@@ -42,17 +42,14 @@ auth.onAuthStateChanged((user) => {
   if (user) {
     // signed in
     // open signup dialog if user isn't registered
-    usersRef
-      .where("email", "==", user.email)
+    getUserQuery(user.email)
       .get()
       .then((querySnapshot) => {
         // if user isn't exists -> adding new user
         if (querySnapshot.size == 0) {
           dialog.hidden = false;
 
-          continueDialogBtn.onclick = () => {
-            addUserIfNotExist(user);
-          };
+          continueDialogBtn.onclick = () => addUserIfNotExist(user);
         }
       })
       .catch((error) => {
@@ -75,9 +72,7 @@ auth.onAuthStateChanged((user) => {
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function (event) {
-  if (event.target == dialog) {
-    clearUser();
-  }
+  if (event.target == dialog) clearUser();
 };
 
 barberToggle.addEventListener(
@@ -86,15 +81,14 @@ barberToggle.addEventListener(
 );
 
 phoneNumber.addEventListener("input", () => {
-  const phoneRegex = new RegExp("^05[0-9]{1}-[0-9]{7}");
+  const phoneRegex = new RegExp("^05[0-9]{8}");
   const match = phoneNumber.value.match(phoneRegex);
 
   continueDialogBtn.disabled = !(match && phoneNumber.value === match[0]);
 });
 
 function addUserIfNotExist(user) {
-  usersRef
-    .where("email", "==", user.email)
+  getUserQuery(user.email)
     .get()
     .then((querySnapshot) => {
       const aboutMeText = barberToggle.checked ? freeText.value : "";
@@ -121,10 +115,7 @@ function addUserIfNotExist(user) {
 }
 
 auth.onAuthStateChanged((user) => {
-  if (user) {
-    // signed in
-    avatar.addEventListener("click", redirectToProfile);
-  }
+  if (user) avatar.addEventListener("click", redirectToProfile);
 });
 
 function redirectToProfile() {
