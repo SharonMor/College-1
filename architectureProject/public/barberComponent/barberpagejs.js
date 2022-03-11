@@ -12,17 +12,13 @@ checkBtn.addEventListener("click", () => {
 });
 
 // setting date fixed times
-let date = new Date();
-let nextYearDate = new Date(
-  date.getFullYear() + 1,
-  date.getMonth(),
-  date.getDate()
-);
-let currentParsedDate = date.toISOString().split("T")[0];
+const nextYearDate = getNextYearDate(new Date());
+const currentParsedDate = new Date().toISOString().split("T")[0];
+const nextYearParsedDate = nextYearDate.toISOString().split("T")[0];
 
 dateInput.value = currentParsedDate;
 dateInput.min = currentParsedDate;
-dateInput.max = nextYearDate.toISOString().split("T")[0];
+dateInput.max = nextYearParsedDate;
 
 // hiding the table when data changes
 dateInput.addEventListener("change", () => {
@@ -43,74 +39,55 @@ auth.onAuthStateChanged((user) => {
     checkBtn.addEventListener("click", () => {
       // clearing old busy cells
       allTableCells.forEach((tableCell) => {
-        tableCell.style.backgroundColor = "rgba(94, 121, 49, 0.904)"; // green
+        tableCell.style.backgroundColor = GREEN_CELL; // green
         tableCell.style.pointerEvents = "none";
       });
 
       // Query reservations of a barber
-      unsubscribe = usersRef
-        .where("isBarber", "==", true)
-        .where("email", "==", user.email)
-        .onSnapshot((querySnapshot) => {
-          // resting map
-          tableCellIdToResId.clear();
-          if (querySnapshot.size == 1) {
-            let resRefList = querySnapshot.docs[0].data().reservations;
-            let barberId = querySnapshot.docs[0].id;
-            resRefList.forEach((resRef) => {
-              // will be reservations = "reservations"
-              let reservations = resRef.parent.id;
-              let resId = resRef.id;
+      unsubscribe = getUserQuery(user.email).onSnapshot((querySnapshot) => {
+        const queriedDoc = validateAndGetSingleDoc(querySnapshot);
+        if (!queriedDoc) return;
 
-              // resDoc holds the actual doc in db
-              let resDoc = db.collection(reservations).doc(resId);
-              resDoc.onSnapshot((doc) => {
-                let docData = doc.data();
+        // resting map
+        tableCellIdToResId.clear();
+        const resRefList = queriedDoc.data().reservations;
+        const barberId = queriedDoc.id;
+        resRefList.forEach((resRef) => {
+          // will be reservations = "reservations"
+          const reservations = resRef.parent.id;
+          const resId = resRef.id;
 
-                // if reservation isn't created by the barber as a customer
-                // i.e filter out reservations done by me (barber)
-                if (docData.customerId != barberId) {
-                  let customerNote = docData.note;
+          // resDoc holds the actual doc in db
+          const resDoc = db.collection(reservations).doc(resId);
+          resDoc.onSnapshot((doc) => {
+            const docData = doc.data();
+            const docDate = docData.date.toDate();
+            const chosenDate = new Date(dateInput.value);
 
-                  // filtering only current day
-                  let docDate = docData.date.toDate();
-                  let chosenDate = new Date(dateInput.value);
-                  if (areDatesEqual(docDate, chosenDate)) {
-                    // converting time (e.g 8:30 --> 8.5)
-                    let hourNum = docDate.getHours();
-                    hourNum += docDate.getMinutes() == 0 ? 0 : 0.5;
-                    const index = getIndexByHour(hourNum);
-                    let busyCell = document.getElementById(`spot${index}`);
-                    busyCell.style.backgroundColor = "#ffb6c1";
-                    busyCell.style.pointerEvents = "auto";
-                    busyCell.title = customerNote;
-                    tableCellIdToResId.set(`spot${index}`, resId);
+            // filter out reservation that is created by the barber as a customer
+            // and filtering out date != today
+            if (
+              docData.customerId == barberId ||
+              !areDatesEqual(docDate, chosenDate)
+            )
+              return;
 
-                    // change name to the appropriate customer user.
-                    let busyCellName = document.getElementById(
-                      `spot${index}name`
-                    );
-                    let customerRef = usersRef.doc(docData.customerId);
-                    customerRef.get().then((customerDoc) => {
-                      let customerName = customerDoc.data().fullName;
-                      busyCellName.innerHTML = customerName;
-                    });
-                  }
-                }
-              });
-            });
-          } else if (querySnapshot.size == 0) {
-            console.log(
-              "Error: Trying to fetch data on barber that isn't exist"
+            const index = getIndexByUserDate(docDate)
+            const busyCell = document.getElementById(`spot${index}`);
+            busyCell.style.backgroundColor = RED_CELL;
+            busyCell.style.pointerEvents = "auto";
+            busyCell.title = docData.note;
+            tableCellIdToResId.set(`spot${index}`, resId);
+
+            // change name to the appropriate customer user.
+            const busyCellName = document.getElementById(`spot${index}name`);
+            getUser(docData.customerId).then(
+              (customerDoc) =>
+                (busyCellName.innerHTML = customerDoc.data().fullName)
             );
-          } else {
-            console.log(
-              "Error: Trying to fetch data on barber," +
-                "but there is multiple barbers with the same name." +
-                "\n please contact the managers"
-            );
-          }
+          });
         });
+      });
     });
   } else {
     // Unsubscribe when the user signs out
@@ -149,7 +126,7 @@ allTableCells.forEach((tableCell) =>
     if (previousCellClicked != tableCell) {
       previousCellClicked = tableCell;
       previousBgColor = tableCell.style.backgroundColor;
-      tableCell.style.backgroundColor = "rgb(50, 158, 231)"; //blue
+      tableCell.style.backgroundColor = BLUE_CELL;
       delayBtn.disabled = false;
     }
     // when clicking on the same cell ("turning it off")
@@ -164,7 +141,7 @@ allTableCells.forEach((tableCell) =>
 auth.onAuthStateChanged((user) => {
   if (user) {
     delayBtn.addEventListener("click", () => {
-      let cellId = previousCellClicked.id;
+      const cellId = previousCellClicked.id;
 
       if (!isCellDelayable(cellId)) {
         alert(
@@ -174,65 +151,43 @@ auth.onAuthStateChanged((user) => {
         return;
       }
 
-      let resId = tableCellIdToResId.get(cellId);
-      let resRef = reservationsRef.doc(resId);
+      const resId = tableCellIdToResId.get(cellId);
+      const resRef = reservationsRef.doc(resId);
 
-      resRef
-        .get()
+      getReservation(resId)
         .then((doc) => {
-          let docDate = doc.data().date.toDate();
+          const targetCustomerId = doc.data().customerId;
+          const docDate = doc.data().date.toDate();
           // delay in 30 min
-          let halfAnHourInSec = 30 * 60000;
-          let delayedDate = new Date(docDate.getTime() + halfAnHourInSec);
+          const halfAnHourInSec = 30 * 60000;
+          const delayedDate = new Date(docDate.getTime() + halfAnHourInSec);
           resRef
             .update({ date: delayedDate })
+            // updating map
+            .then(() => tableCellIdToResId.delete(cellId))
             .then(() => {
-              // updating map
-              tableCellIdToResId.delete(cellId);
-
               // sending mail
-              resRef.get().then((resDoc) => {
-                let targetCustomerRef = usersRef.doc(resDoc.data().customerId);
+              getUser(targetCustomerId).then((targetDoc) => {
+                const targetName = targetDoc.data().fullName;
+                const targetEmail = targetDoc.data().email;
 
-                targetCustomerRef.get().then((targetDoc) => {
-                  let targetName = targetDoc.data().fullName;
-                  let targetEmail = targetDoc.data().email;
-
-                  let bodyToSend = `<h2>hello ${targetName}</h2>
-                      <h4>we would like to inform you that your barber delayed your reservation.</h4>
-                      <br>
-                      <table>
-                        <tr>
-                          <td>old date:</td>
-                          <td>${docDate}</td>
-                        </tr>
-                        <tr>
-                          <td><b>new date:</b></td>
-                          <td>${delayedDate}</td>
-                        </tr>
-                        <tr>
-                          <td>reservation id:</td>
-                          <td>${resId}</td>
-                        </tr>
-                      </table>
-                      <h4>For more information please contact the barber.</h4>
-                      <br>
-                      <h5>details about the barber can be found in the website's booking page</h5>`;
-
-                  const subjectToSend = "MyBarber reservation has been delayed";
-                  mailToSend = new Mail(targetEmail, subjectToSend, bodyToSend)
-                  sendMail(mailToSend);
-                });
+                prepareAndSendMail(
+                  targetEmail,
+                  targetName,
+                  docDate,
+                  delayedDate,
+                  resId
+                );
               });
             })
             .catch((error) => {
               // The document probably doesn't exist.
               console.error("Error updating document: ", error);
             });
-
-          // resting chosen cell table
-          previousCellClicked.style.backgroundColor =
-            "rgba(94, 121, 49, 0.904)"; // green
+        })
+        // resting chosen cell table
+        .then(() => {
+          previousCellClicked.style.backgroundColor = GREEN_CELL;
           previousCellClicked.style.pointerEvents = "none";
           previousCellClicked = null;
           delayBtn.disabled = true;
@@ -243,17 +198,3 @@ auth.onAuthStateChanged((user) => {
     });
   }
 });
-
-function isCellDelayable(cellId) {
-  // `spot${index}` ==> cellIndex = index
-  let cellIndex = cellId.substr(4);
-  let nextCellIndex = parseInt(cellIndex) + 1;
-  let nextCellId = `spot${nextCellIndex}`;
-
-  let lastCellIndex = getIndexByHour(endHour);
-  let lastCellId = `spot${lastCellIndex}`;
-
-  // if there is reservation registered on next cell
-  if (tableCellIdToResId.get(nextCellId) || cellId == lastCellId) return false;
-  return true;
-}

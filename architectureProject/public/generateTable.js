@@ -1,14 +1,25 @@
+// constant values for table
+const startHour = 8;
+const endHour = 18;
+const numOfCols = 7;
+const offset = 0.5;
+
 // returns index of cell by offset (by default = 0.5)
 // e.g (hour = 17, offset = 0.5) => 19
 // offset is the time jump between hours.
 let getIndexByHour = (hour, startTime = startHour, offsetNum = offset) =>
   (hour - startTime) / offsetNum + 1;
 
-// constant values for table
-const startHour = 8;
-const endHour = 18;
-const numOfCols = 7;
-const offset = 0.5;
+/**
+ * @param {Date} docDate - date of a some user 
+ * @returns table index to the appropriate date
+ */
+// mapping db time to index (e.g 8:30 --> 8.5 --> index: 2)
+const getIndexByUserDate = (docDate) => {
+  let hourNum = docDate.getHours();
+  hourNum += docDate.getMinutes() == 0 ? 0 : offset;
+  return getIndexByHour(hourNum);
+};
 
 function generateTable(isBarber = false) {
   // generating hours table
@@ -37,13 +48,12 @@ function generateTable(isBarber = false) {
     }
 
     if (isBarber) {
-        tdInnerHtml = `<div>
+      tdInnerHtml = `<div>
                          <span class="time_span" id="spot${index}time">${hour}</span>
                          <span class="name_span" id="spot${index}name"></span>
                        </div>`;
-
     } else {
-        tdInnerHtml = `<span class="time_span" id="spot${index}time">${hour}</span>`;
+      tdInnerHtml = `<span class="time_span" id="spot${index}time">${hour}</span>`;
     }
 
     // pushing cell

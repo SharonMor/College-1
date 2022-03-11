@@ -1,14 +1,3 @@
-/**
- * @param {Date} date - given date to increment to.
- * @returns a date, next year from given date.
- */
-const getNextYearDate = (date) => {
-  let oneYearFromDate = new Date(date);
-  oneYearFromDate.setFullYear(date.getFullYear() + 1);
-
-  return oneYearFromDate;
-};
-
 const getSelectedBarber = () =>
   barbersSelect.options[barbersSelect.selectedIndex].value;
 

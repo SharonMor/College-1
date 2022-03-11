@@ -135,15 +135,12 @@ auth.onAuthStateChanged((user) => {
                 // filtering only current day
                 let docDate = doc.data().date.toDate();
                 let chosenDate = new Date(dateInput.value);
-                if (areDatesEqual(docDate, chosenDate)) {
-                  // converting time (e.g 8:30 --> 8.5)
-                  let hourNum = docDate.getHours();
-                  hourNum += docDate.getMinutes() == 0 ? 0 : 0.5;
-                  const index = getIndexByHour(hourNum);
-                  let busyCell = document.getElementById(`spot${index}`);
-                  busyCell.style.backgroundColor = "#ffb6c1";
-                  busyCell.style.pointerEvents = "none";
-                }
+                if (!areDatesEqual(docDate, chosenDate)) return;
+
+                const index = getIndexByUserDate(docDate);
+                let busyCell = document.getElementById(`spot${index}`);
+                busyCell.style.backgroundColor = RED_CELL;
+                busyCell.style.pointerEvents = "none";
               })
               .catch((error) => {
                 console.log("Error getting document:", error);

@@ -3,6 +3,24 @@ const reservationsRef = db.collection("reservations");
 
 ///^ Getters ^///
 /**
+ * @param {String} resId - the id of reservation to be fetched
+ *
+ * @returns {Promise} Promise of fetched reservation.
+ */
+ function getReservation(resId) {
+  return new Promise((resolve, reject) => {
+    reservationsRef
+      .doc(resId)
+      .get()
+      .then((doc) => {
+        if (doc.exists) resolve(doc);
+        else reject("reservation document doesn't exists");
+      })
+      .catch((error) => reject(error));
+  });
+}
+
+/**
  * @param {String} userId
  * @returns {Promise} Promise of get user in db
  */
@@ -50,28 +68,6 @@ function _isSingleResult(querySnapshot) {
   }
   return false;
 }
-
-function snapshotUser(isBarber, email) {}
-
-/**
- * @param {String} resId - the id of reservation to be fetched
- *
- * @returns {Promise} Promise of fetched reservation.
- */
-function getReservation(resId) {
-  return new Promise((resolve, reject) => {
-    reservationsRef
-      .doc(resId)
-      .get()
-      .then((doc) => {
-        if (doc.exists) resolve(doc);
-        else reject("reservation document doesn't exists");
-      })
-      .catch((error) => reject(error));
-  });
-}
-
-function snapshotReservations() {}
 
 ///^ Setters / Updates / Deletes ^///
 
