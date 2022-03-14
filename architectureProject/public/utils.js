@@ -1,4 +1,4 @@
-const mailToken = "0c6b424a-97e0-4992-896d-0e9a6285f324";
+const mailToken = "ADD_YOUR_TOKEN_HERE";
 
 // Mail object for smtp mailing service
 class Mail {
