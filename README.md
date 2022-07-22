@@ -7,8 +7,7 @@ College projects
       <br>&emsp;&emsp;&emsp;
         show use of SAAS and SOA in a software, and some minimal design patterns (adapter, singleton)
         
-      Website: https://barbersproject-dd047.web.app/
+  [Website page](https://barbersproject-dd047.web.app/)
        
-      explanation video (in Hebrew):
-        https://www.youtube.com/watch?v=jq56ck361eU
-        
+  [Explanation video (in Hebrew)](https://www.youtube.com/watch?v=jq56ck361eU)
+
